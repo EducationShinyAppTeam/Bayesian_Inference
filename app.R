@@ -195,7 +195,7 @@ ui <- list(
         tabItem(
           tabName = "example",
           withMathJax(),
-          h2("Example Questions"),
+          h2("Example"),
           fluidPage(
             p("Researchers at the University of 
                   California at San Diego studied the degree to which people have 
@@ -262,11 +262,11 @@ ui <- list(
               width = 4,
               offset = 0,
               wellPanel(
-                tags$strong("Prior"),
+                tags$strong("Beta prior"),
                 numericInput(
                   inputId = "para1E1",
                   label = "\u03B1",
-                  value = 1,
+                  value = 2,
                   min = 1,
                   max = 10,
                   step = 1
@@ -274,8 +274,8 @@ ui <- list(
                 numericInput(
                   inputId = "para2E1",
                   label = "\u03B2",
-                  value = 3,
-                  min = 3,
+                  value = 2,
+                  min = 1,
                   max = 30,
                   step = 1
                 ),
@@ -288,7 +288,7 @@ ui <- list(
                   step = 0.01
                 ),
                 withMathJax(
-                  p("Null Hypothesis"),
+                  p("Model for comparison"),
                   p("p", tags$sub("c"),"= 0.5"),
                   p("Sample Data"),
                   p("\\(n =\\) ", 25),
@@ -600,10 +600,10 @@ ui <- list(
                   offset = 0,
                   wellPanel(
                     ###### bayes input parts----
-                    tags$strong("Prior"),
+                    tags$strong("Beta prior"),
                     numericInput(
                       inputId = "para1B1",
-                      label = "Shape1 \u03B1",
+                      label = "\u03B1",
                       value = 1,
                       min = 1,
                       max = 10,
@@ -611,9 +611,9 @@ ui <- list(
                     ),
                     numericInput(
                       inputId = "para2B1",
-                      label = "Shape2 \u03B2",
+                      label = "\u03B2",
                       value = 3,
-                      min = 3,
+                      min = 1,
                       max = 30,
                       step = 1
                     ),
@@ -635,7 +635,7 @@ ui <- list(
                     ),
                     sliderInput(
                       inputId = "nullB1",
-                      label = HTML(paste0("Null hypothesis p",tags$sub("c"))),
+                      label = HTML(paste0("Model for comparison p",tags$sub("c"))),
                       value = 0.01,
                       min = 0,
                       max = 1,
@@ -699,7 +699,7 @@ ui <- list(
                   offset = 0,
                   wellPanel(
                     ###### bayes input parts----
-                    tags$strong("Prior"),
+                    tags$strong("Gamma prior"),
                     numericInput(
                       inputId = "para1B2",
                       label = "Shape \u03B1",
@@ -734,7 +734,7 @@ ui <- list(
                     ),
                     sliderInput(
                       inputId = "nullB2",
-                      label = HTML(paste0("Null hypothesis \u03BB",tags$sub("c"))),
+                      label = HTML(paste0("Model for comparison \u03BB",tags$sub("c"))),
                       value = 0.1,
                       min = 0,
                       max = 10,
@@ -810,7 +810,7 @@ ui <- list(
                   offset = 0,
                   wellPanel(
                     ###### bayes input parts----
-                    tags$strong("Prior"),
+                    tags$strong("Normal prior"),
                     numericInput(
                       inputId = "para1B3",
                       label = "Mean \u03C4",
@@ -845,7 +845,7 @@ ui <- list(
                     ),
                     sliderInput(
                       inputId = "nullB3",
-                      label = HTML(paste0("Null hypothesis \u03BC",tags$sub("c"))),
+                      label = HTML(paste0("Model for comparison \u03BC",tags$sub("c"))),
                       value = 0,
                       min = -0.5,
                       max = 0.5,
@@ -1258,7 +1258,7 @@ server <- function(input, output, session) {
         y=c(rep(0,1000),seq(0,minbf,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "Pc vs. Pc",
+        name = "p<sub>c</sub> vs. p<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("p:",0.5,"<br>Log(BF):",0),
@@ -1287,7 +1287,7 @@ server <- function(input, output, session) {
       layout(
         title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",font=list(size=18),xanchor="right"),
         xaxis=list(title="Proportion p",titlefont=list(size=16)),
-        yaxis=list(title="Log Bayes factor",titlefont=list(size=16)),
+        yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
         legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.3))
     return(g)
@@ -1801,7 +1801,7 @@ server <- function(input, output, session) {
         y=c(rep(pvpc,1000),seq(minbf,pvpc,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "P vs. Pc",
+        name = "p vs. p<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("p:",trueB1(),"<br>Log(BF):",round(pvpc,3)),
@@ -1815,7 +1815,7 @@ server <- function(input, output, session) {
         y=c(rep(0,1000),seq(0,minbf,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "Pc vs. Pc",
+        name = "p<sub>c</sub> to p<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("p:",nullB1(),"<br>Log(BF):",0),
@@ -1844,7 +1844,7 @@ server <- function(input, output, session) {
       layout(
         title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",font=list(size=18),xanchor="right"),
         xaxis=list(title="Proportion p",titlefont=list(size=16)),
-        yaxis=list(title="Log Bayes factor",titlefont=list(size=16)),
+        yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
         legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.3))
     return(g)
@@ -1908,7 +1908,7 @@ server <- function(input, output, session) {
     ctable<-matrix(c(round(pvpll,3),round(ci[1],3),round(ci[2],3)),nrow=1)
     c2<-paste("Credible region"," lower bound",sep = "<br>")
     c3<-paste("Credible region"," upper bound",sep = "<br>")
-    colnames(ctable)<-c("Log(BF) comparing P to Pc",c2,c3)
+    colnames(ctable)<-c("Log(BF) comparing p to p<sub>c</sub>",c2,c3)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
   ## Poisson----
@@ -2398,7 +2398,7 @@ server <- function(input, output, session) {
         y=c(rep(pvpc,1000),seq(minbf,pvpc,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "\u3BB vs. \u3BB c",
+        name = "\u3BB vs. \u03BB<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("\u3BB:",trueB2(),"<br>Log(BF):",round(pvpc,3)),
@@ -2412,7 +2412,7 @@ server <- function(input, output, session) {
         y=c(rep(0,1000),seq(0,minbf,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "\u3BB c vs. \u3BB c",
+        name = "\u03BB<sub>c</sub> to \u03BB<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("\u3BB:",nullB2(),"<br>Log(BF):",0),
@@ -2441,7 +2441,7 @@ server <- function(input, output, session) {
       layout(
         title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u3BB<sub>c</sub>",font=list(size=18),xanchor="right"),
         xaxis=list(title="Mean \u3BB",titlefont=list(size=16)),
-        yaxis=list(title="Log Bayes factor",titlefont=list(size=16)),
+        yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
         legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.3))
     return(g)
@@ -2498,7 +2498,7 @@ server <- function(input, output, session) {
     ctable<-matrix(c(round(pvpll,3),round(ci[1],3),round(ci[2],3)),nrow=1)
     c2<-paste("Credible region"," lower bound",sep = "<br>")
     c3<-paste("Credible region"," upper bound",sep = "<br>")
-    colnames(ctable)<-c("Log(BF) comparing \u3BB to \u3BB c",c2,c3)
+    colnames(ctable)<-c("Log(BF) comparing \u03BB to \u03BB<sub>c</sub>",c2,c3)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
   
@@ -2944,7 +2944,7 @@ server <- function(input, output, session) {
         y=c(rep(pvpc,1000),seq(minbf,pvpc,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "\u03BC vs. \u03BC c",
+        name = "\u03BC vs. \u03BC<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("\u03BC:",trueB3(),"<br>Log(BF):",round(pvpc,3)),
@@ -2958,7 +2958,7 @@ server <- function(input, output, session) {
         y=c(rep(0,1000),seq(0,minbf,len=1000)),
         mode="lines",
         hoverinfo="text",
-        name = "\u03BC c vs. \u03BC c",
+        name = "\u03BC<sub>c</sub> vs. \u03BC<sub>c</sub>",
         opacity = 1,
         showlegend=T,
         text=paste("\u03BC:",nullB3(),"<br>Log(BF):",0),
@@ -2987,7 +2987,7 @@ server <- function(input, output, session) {
       layout(
         title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u03BC<sub>c</sub>",font=list(size=18),xanchor="right"),
         xaxis=list(title="Mean \u03BC",titlefont=list(size=16)),
-        yaxis=list(title="Log Bayes factor",titlefont=list(size=16)),
+        yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
         legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.3))
     return(g)
@@ -3041,7 +3041,7 @@ server <- function(input, output, session) {
     ctable<-matrix(c(round(pvpll,3),round(ci[1],3),round(ci[2],3)),nrow=1)
     c2<-paste("Credible region"," lower bound",sep = "<br>")
     c3<-paste("Credible region"," upper bound",sep = "<br>")
-    colnames(ctable)<-c("Log(BF) comparing \u03BC to \u03BC c",c2,c3)
+    colnames(ctable)<-c("Log(BF) comparing \u03BC to \u03BC<sub>c</sub>",c2,c3)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
 }
