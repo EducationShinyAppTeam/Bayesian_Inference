@@ -2480,12 +2480,12 @@ server <- function(input, output, session) {
     # denominator 
     denominator<-dpois(
       x = sum(simulationB2()),
-      lambda = nullB2()
+      lambda = nullB2()*nB2()
     )
     # p/pc
     pll<-dpois(
       x = sum(simulationB2()),
-      lambda=trueB2()
+      lambda=trueB2()*nB2()
     )
     pvpll<-log10(pll/denominator)
     # ci
