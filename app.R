@@ -238,7 +238,7 @@ ui <- list(
                 sliderInput(
                   inputId = "clE1",
                   label = "Confidence level",
-                  min = 0,
+                  min = 0.6,
                   max = 1,
                   step = 0.01,
                   value = 0.95
@@ -316,7 +316,7 @@ ui <- list(
                   inputId = "creE1",
                   label = "Credible level",
                   value = 0.95,
-                  min = 0,
+                  min = 0.6,
                   max = 1,
                   step = 0.01
                 ),
@@ -387,7 +387,7 @@ ui <- list(
                       inputId = "clF1",
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -467,7 +467,7 @@ ui <- list(
                       inputId = "clF2",
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -554,7 +554,7 @@ ui <- list(
                       inputId = "clF3",
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -674,7 +674,7 @@ ui <- list(
                       inputId = "clB1",
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -773,7 +773,7 @@ ui <- list(
                       inputId = "clB2",
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -884,7 +884,7 @@ ui <- list(
                       inputId = "clB3",
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
-                      min = 0,
+                      min = 0.6,
                       max = 1,
                       step = 0.01
                     ),
@@ -1088,7 +1088,7 @@ server <- function(input, output, session) {
   output$pvaluefunctionE1<-renderPlot({
     validate(
       need(
-        input$clE1!=0 && input$clE1!=1,
+        input$clE1!=1,
         "Confidence Levels must be positive values less than 1"
         )
     )
@@ -1215,7 +1215,7 @@ server <- function(input, output, session) {
   output$httableE1<-renderTable({
     validate(
       need(
-        input$clE1!=0 && input$clE1!=1,
+        input$clE1!=1,
         ""
       )
     )
@@ -1248,7 +1248,7 @@ server <- function(input, output, session) {
   output$credibleE1<-renderPlot({
     validate(
       need(
-        input$creE1!=0 && input$creE1!=1,
+        input$creE1!=1,
         "Credible Levels must be positive values less than 1"
       ),
       need(
@@ -1369,7 +1369,7 @@ server <- function(input, output, session) {
   output$bfE1<-renderPlotly({
     validate(
       need(
-      input$creE1!=0 && input$creE1!=1,
+      input$creE1!=1,
       "Credible Levels must be positive values less than 1"
       ),
       need(
@@ -1463,7 +1463,7 @@ server <- function(input, output, session) {
   output$bftableE1<-renderTable({
     validate(
       need(
-        input$creE1!=0 && input$creE1!=1,
+        input$creE1!=1,
         ""
       ),
       need(
@@ -1660,7 +1660,7 @@ server <- function(input, output, session) {
         message = "Provide a true p between (0,1)"
       ),
       need(
-        input$clF1!=0 && input$clF1!=1,
+        input$clF1!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -1819,7 +1819,7 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$clF1!=0 && input$clF1!=1,
+        input$clF1!=1,
         ""
       )
     )
@@ -1879,7 +1879,7 @@ server <- function(input, output, session) {
         "Provide a valid prior"
       ),
       need(
-        input$clB1!=0 && input$clB1!=1,
+        input$clB1!=1,
         "Credible Levels must be positive values less than 1"
       )
     )
@@ -2009,7 +2009,7 @@ server <- function(input, output, session) {
         "Provide a valid prior"
       ),
       need(
-        input$clB1!=0 && input$clB1!=1,
+        input$clB1!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -2147,7 +2147,7 @@ server <- function(input, output, session) {
         ""
       ),
       need(
-        input$clB1!=0 && input$clB1!=1,
+        input$clB1!=1,
         ""
       )
     )
@@ -2315,7 +2315,7 @@ server <- function(input, output, session) {
         message = "Provide a true \u03BB larger than 0"
       ),
       need(
-        input$clF2!=0 && input$clF2!=1,
+        input$clF2!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -2475,7 +2475,7 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$clF2!=0 && input$clF2!=1,
+        input$clF2!=1,
         ""
       )
     )
@@ -2527,7 +2527,7 @@ server <- function(input, output, session) {
         message = "Provide a true \u03BB larger than 0"
       ),
       need(
-        input$clB2!=0 && input$clB2!=1,
+        input$clB2!=1,
         "Credible Levels must be positive values less than 1"
       )
     )
@@ -2638,7 +2638,7 @@ server <- function(input, output, session) {
         message = "Provide a true \u03BB larger than 0"
       ),
       need(
-        input$clB2!=0 && input$clB2!=1,
+        input$clB2!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -2758,7 +2758,7 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$clB2!=0 && input$clB2!=1,
+        input$clB2!=1,
         ""
       )
     )
@@ -2920,7 +2920,7 @@ server <- function(input, output, session) {
         message = "Set parameters and press the Simulate button."
       ),
       need(
-        input$clF3!=0 && input$clF3!=1,
+        input$clF3!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -3056,7 +3056,7 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$clF3!=0 && input$clF3!=1,
+        input$clF3!=1,
         ""
       )
     )
@@ -3101,7 +3101,7 @@ server <- function(input, output, session) {
         "Provide a valid standard deviation"
       ),
       need(
-        input$clB3!=0 && input$clB3!=1,
+        input$clB3!=1,
         "Credible Levels must be positive values less than 1"
       )
     )
@@ -3212,7 +3212,7 @@ server <- function(input, output, session) {
         "Provide a valid standard deviation"
       ),
       need(
-        input$clB3!=0 && input$clB3!=1,
+        input$clB3!=1,
         "Confidence Levels must be positive values less than 1"
       )
     )
@@ -3330,7 +3330,7 @@ server <- function(input, output, session) {
         ""
       ),
       need(
-        input$clB3!=0 && input$clB3!=1,
+        input$clB3!=1,
         ""
       )
     )
