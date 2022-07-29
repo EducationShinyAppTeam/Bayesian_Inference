@@ -9,6 +9,7 @@ library(dplyr)
 library(shinyjs)
 library(exactci)
 library(plotly)
+library(gridExtra)
 # Define UI for App ----
 ui <- list(
   ## Create the app page ----
@@ -91,7 +92,7 @@ ui <- list(
             citeApp(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 7/11/2022 by JF.")
+            div(class = "updated", "Last Update: 7/29/2022 by JF.")
           )
         ),
         #### Set up the Prerequisites Page ----
@@ -188,7 +189,19 @@ ui <- list(
               tags$li("The Gamma distribution is a conjugate prior to the Poisson likelihood."),
               tags$li("The Normal distribution is a conjugate prior to the Normal likelihood (known
               variance case).")
-            ),
+            )
+          ),
+          box(
+            title = strong("Noninformative prior"),
+            status = "primary",
+            collapsible = TRUE,
+            collapsed = TRUE,
+            width = '100%',
+            'A noninformative prior is an attempt to provide a distribution that 
+            expresses "ignorance" about the parameter at hand. Researchers have 
+            made different proposals for how to operationalize that idea. 
+            In this app we illustrate the concept by using the uniform distribution 
+            as a noninformative prior for the parameter p in a Binomial experiment.'
           )
         ),
         #### Set up Example Page----
@@ -197,6 +210,7 @@ ui <- list(
           withMathJax(),
           h2("Example"),
           fluidPage(
+            shinyjs::useShinyjs(),
             p("Researchers at the University of 
                   California at San Diego studied the degree to which people have 
                   a resemblance to their purebred pet dogs. They theorized that 
@@ -229,9 +243,14 @@ ui <- list(
                   step = 0.01,
                   value = 0.95
                 ),
+                checkboxInput(
+                  inputId = "add1",
+                  label = "Show Prior and Posterior plot",
+                  value = FALSE
+                  ),
                 withMathJax(
                   p("Null Hypothesis"),
-                  p("p", tags$sub("0")," = 0.5"),
+                  p(HTML(paste0("p",tags$sub("0")," = 0.5"))),
                   p("Sample Data"),
                   p("\\(n =\\) ", 25),
                   p("\\(x =\\) ", 16),
@@ -243,6 +262,10 @@ ui <- list(
               width = 8,
               offset = 0,
               plotOutput("pvaluefunctionE1"),
+              conditionalPanel(
+                condition = "input.add1 == 1",
+                plotOutput("plotsgroup1E1")
+              ),
               checkboxInput("results1E1",
                             "Results table", FALSE),
               conditionalPanel(
@@ -254,7 +277,7 @@ ui <- list(
             p(tags$strong("Bayesian Inference Side:"),"Our initial uncertainty 
                   about p might be quantified by a prior distribution using the 
                   Beta distribution. After observing the data, we would look 
-                  at the posterior distribution of p and seek a credible interval. 
+                  at the posterior distribution of p and seek a Credible region. 
                   To compare different models for what p might be with the specific 
                   model that p = 0.5, we can use the Bayes Factor."),
             br(),
@@ -263,22 +286,32 @@ ui <- list(
               offset = 0,
               wellPanel(
                 tags$strong("Beta prior"),
-                numericInput(
+                sliderInput(
                   inputId = "para1E1",
-                  label = "\u03B1",
-                  value = 2,
-                  min = 1,
-                  max = 10,
-                  step = 1
+                  label = "Mean \u03BC",
+                  value = 0.5,
+                  min = 0,
+                  max = 1,
+                  step = 0.1
                 ),
-                numericInput(
+                sliderInput(
                   inputId = "para2E1",
-                  label = "\u03B2",
-                  value = 2,
-                  min = 1,
-                  max = 30,
-                  step = 1
+                  label = "SD \u03C3",
+                  value = 0.289,
+                  min = 0,
+                  max = 0.5,
+                  step = 0.001
                 ),
+                div(
+                  style = "text-align: center;",
+                  bsButton(
+                    inputId = "nonpriorE1",
+                    label = "Noninformative Prior",
+                    size = "default",
+                    style = "default"
+                  )
+                ),
+                br(),
                 sliderInput(
                   inputId = "creE1",
                   label = "Credible level",
@@ -287,13 +320,19 @@ ui <- list(
                   max = 1,
                   step = 0.01
                 ),
+                checkboxInput(
+                  inputId = "add2",
+                  label = "Show P-value Function plot",
+                  value = FALSE
+                  ),
                 withMathJax(
-                  p("Model for comparison"),
-                  p("p", tags$sub("c"),"= 0.5"),
+                  p("Model for comparison "),
+                  p(HTML(paste0("p",tags$sub("c")," = 0.5"))),
                   p("Sample Data"),
                   p("\\(n =\\) ", 25),
                   p("\\(x =\\) ", 16),
-                  p("\\(\\hat{p} =\\)",round(16/25,3))
+                  HTML(paste("\\(\\hat{p} =\\)",round(16/25,3)))
+                
                 )
               )
             ),
@@ -301,6 +340,10 @@ ui <- list(
               width = 8,
               offset = 0,
               plotOutput("credibleE1"),
+              conditionalPanel(
+                condition = "input.add2 == 1",
+                plotOutput("plotsgroup2E1")
+              ),
               checkboxInput("results2E1",
                             "Results table", FALSE),
               conditionalPanel(
@@ -592,7 +635,7 @@ ui <- list(
                   E(p)=\u03B1/(\u03B1+\u03B2)). Knowing that this may be off by a good deal, 
                   the owner wants to have a standard deviation that is also 
                   about 0.25. The owner is about to take data at the new location.
-                  Use the slider to explore how the researcher's decisiones about 
+                  Use the slider to explore how the researcher's decisions about 
                   the sample size and prior knowledge affect the result."),
                 br(),
                 column(
@@ -601,22 +644,32 @@ ui <- list(
                   wellPanel(
                     ###### bayes input parts----
                     tags$strong("Beta prior"),
-                    numericInput(
+                    sliderInput(
                       inputId = "para1B1",
-                      label = "\u03B1",
-                      value = 1,
-                      min = 1,
-                      max = 10,
-                      step = 1
+                      label = "Mean \u03BC",
+                      value = 0.5,
+                      min = 0,
+                      max = 1,
+                      step = 0.1
                     ),
-                    numericInput(
+                    sliderInput(
                       inputId = "para2B1",
-                      label = "\u03B2",
-                      value = 3,
-                      min = 1,
-                      max = 30,
-                      step = 1
+                      label = "SD \u03C3",
+                      value = 0.289,
+                      min = 0,
+                      max = 0.5,
+                      step = 0.001
                     ),
+                    div(
+                      style = "text-align: center;",
+                      bsButton(
+                        inputId = "nonpriorB1",
+                        label = "Noninformative Prior",
+                        size = "default",
+                        style = "default"
+                      )
+                    ),
+                    br(),
                     sliderInput(
                       inputId = "clB1",
                       label = "Credible level 1-\u03B1",
@@ -630,7 +683,7 @@ ui <- list(
                       label = "Sample size",
                       value = 5,
                       min = 1,
-                      max = 25,
+                      max = 90,
                       step = 1
                     ),
                     sliderInput(
@@ -700,7 +753,7 @@ ui <- list(
                   wellPanel(
                     ###### bayes input parts----
                     tags$strong("Gamma prior"),
-                    numericInput(
+                    sliderInput(
                       inputId = "para1B2",
                       label = "Shape \u03B1",
                       value = 3,
@@ -708,7 +761,7 @@ ui <- list(
                       max = 10,
                       step = 1
                     ),
-                    numericInput(
+                    sliderInput(
                       inputId = "para2B2",
                       label = "Rate \u03BB",
                       value = 2,
@@ -729,7 +782,7 @@ ui <- list(
                       label = "Sample size",
                       value = 5,
                       min = 1,
-                      max = 25,
+                      max = 90,
                       step = 1
                     ),
                     sliderInput(
@@ -798,12 +851,12 @@ ui <- list(
                 are still unbiased on the log scale. The difference between the 
                 log of their weights and the estimated log weight based on the 
                 volume measurements can be modeled as a normal distribution with 
-                an unknown mean \u03BC and a standard deviation of ablout 0.058 (= ln(1.06)). 
+                an unknown mean \u03BC and a standard deviation of about 0.058 (= ln(1.06)). 
                 Prior to collecting data, the uncertainty in the value of \u03BC is 
                 modeled as a Normal distribution with a mean of \u03C4 and a standard 
                 deviation of \u03C3. Use the sliders to see how your decisions about 
                 the prior distribution of \u03BC might affect its posterior distribution 
-                and how much you might favor one value over over another.")),
+                and how much you might favor one value over another.")),
                 br(),
                 column(
                   width = 4,
@@ -811,7 +864,7 @@ ui <- list(
                   wellPanel(
                     ###### bayes input parts----
                     tags$strong("Normal prior"),
-                    numericInput(
+                    sliderInput(
                       inputId = "para1B3",
                       label = "Mean \u03C4",
                       value = 0,
@@ -819,11 +872,11 @@ ui <- list(
                       max = 1,
                       step = 0.1
                     ),
-                    numericInput(
+                    sliderInput(
                       inputId = "para2B3",
                       label = "SD \u03C3",
                       value = 0.01,
-                      min = 0.01,
+                      min = 0,
                       max = 1,
                       step = 0.001
                     ),
@@ -840,7 +893,7 @@ ui <- list(
                       label = "Sample size",
                       value = 5,
                       min = 1,
-                      max = 25,
+                      max = 90,
                       step = 1
                     ),
                     sliderInput(
@@ -893,6 +946,11 @@ ui <- list(
           tabName = "references",
           withMathJax(),
           h2("References"),
+          p(
+            class = "hangingindent",
+            "Auguie, B. (2022). gridExtra: Miscellaneous Functions for 'Grid' Graphics.
+            (v 2.3) [R package]. Available from https://cran.r-project.org/web/packages/gridExtra"
+          ),
           p(
             class = "hangingindent",
             "Attali, D. (2020). shinyjs: Easily Improve the User Experience of Your 
@@ -991,7 +1049,42 @@ server <- function(input, output, session) {
   )
   
   # Example Page----
+  ## parameters
+  ## parameters range
+  ## sd < sqrt(mu(1-mu))
+  observeEvent(
+    eventExpr = input$para1E1,
+    handlerExpr = {
+      updateSliderInput(
+        session = session,
+        inputId = "para2E1",
+        label = "SD \u03C3",
+        max = round(sqrt(input$para1E1*(1-input$para1E1)),2)
+      )
+    }
+  )
+  ## update noninformative prior
+  observeEvent(
+    eventExpr = input$nonpriorE1,
+    handlerExpr = {
+        updateSliderInput(
+          session = session,
+          inputId = "para1E1",
+          value = 1/2
+        )
+        updateSliderInput(
+          session = session,
+          inputId = "para2E1",
+          value = sqrt(1/12)
+        )
+    }
+  )
+
   ## n =25, success=16
+  playplots<-reactiveValues(
+    pvaluefunction = NULL,
+    credible = NULL
+  )
   output$pvaluefunctionE1<-renderPlot({
     validate(
       need(
@@ -1017,21 +1110,10 @@ server <- function(input, output, session) {
       tsmethod = "central",
       conf.level = input$clE1
     )$conf.int
-    ### set xlim
-    cimaxP<-binom.exact(
-      x = 16,
-      n = 25,
-      p = 0.5,
-      alternative="two.side",
-      tsmethod = "central",
-      conf.level = 0.999
-    )$conf.int
-    
-    xlimP<-c(max(0,cimaxP[1]),cimaxP[2])
-    
+
     ### get p-value list
-    changeP<-(xlimP[2]-xlimP[1])/1000
-    thetaP<-xlimP[1]
+    changeP<-(1-0)/1000
+    thetaP<-0
     pvaluelistP<-c()
     thetalistP<-c()
     genepvaluesP<-function(thetaP){
@@ -1043,7 +1125,7 @@ server <- function(input, output, session) {
         tsmethod="central"
       )$p.value
     }
-    while(thetaP<=xlimP[2]){
+    while(thetaP<=1){
       pvaluesP<-genepvaluesP(thetaP)
       pvaluelistP<-c(pvaluelistP,pvaluesP)
       thetalistP<-c(thetalistP,thetaP)
@@ -1063,8 +1145,17 @@ server <- function(input, output, session) {
         size = 1,
         alpha = 0.5
       )+
-      scale_x_continuous(expand = expansion(mult = 0)) +
-      scale_y_continuous(expand = expansion(mult = .05))+
+      scale_x_continuous(
+        limits = c(0, 1),
+        expand = expansion(mult =0, add = 0),
+        breaks = seq.int(from = 0, to = 1, by = 0.2),
+        labels = c("0","0.2","0.4","0.6", "0.8", "1")
+      )+
+      scale_y_continuous(
+        expand = expansion(mult = 0.05),
+        breaks = seq.int(from = 0, to = 1, by = 0.2),
+        labels = c("0","0.2","0.4","0.6", "0.8", "1"),
+      )+
       labs(
         title = "P-value Function",
         x = "Null hypothesis proportion p", 
@@ -1075,14 +1166,23 @@ server <- function(input, output, session) {
         aes(x=ciP[1],y=0,xend=ciP[2],yend=0,colour = "Confidence interval"),
         size = 1 
       )+
+      geom_point(
+        mapping=aes(x=c(ciP[1],ciP[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ciP[1],xmax=ciP[2],y=0,colour = "Confidence interval"),
+        height=0.05*1,
+        size=1
+      )+
       geom_segment(
-        aes(x = xlimP[1], y = 1, xend = 16/25, yend = 1, colour = "Observed estimate")
+        aes(x = 0, y = 1, xend = 16/25, yend = 1, colour = "Observed estimate")
       )+
       geom_segment(
         aes(x = 16/25, y = 0, xend = 16/25, yend = 1, colour = "Observed estimate")
       )+
       geom_segment(
-        aes(x = xlimP[1], y = p_value, xend = 0.5, yend = p_value, colour = "Null value")
+        aes(x = 0, y = p_value, xend = 0.5, yend = p_value, colour = "Null value")
       )+
       geom_segment(
         aes(x = 0.5, y = 0, xend = 0.5, yend = p_value, colour = "Null value")
@@ -1100,8 +1200,16 @@ server <- function(input, output, session) {
         plot.caption = element_text(size = 18),
         text = element_text(size = 18),
         axis.title = element_text(size = 16),
-        legend.position = "bottom"
+        legend.position = "bottom",
+        plot.margin = margin(
+          t=0,
+          b=0,
+          r=1,
+          l=1,
+          unit = "cm"
+        )
       )
+    playplots$pvaluefunction<-gP
     return(gP)
   })
   output$httableE1<-renderTable({
@@ -1132,6 +1240,11 @@ server <- function(input, output, session) {
     colnames(ctable)<-c("p-value",c2,c3)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
+  
+  ### Bayes----
+  s1E<-reactive(((1-input$para1E1)/input$para2E1^2-1/input$para1E1)*input$para1E1^2)
+  s2E<-reactive((((1-input$para1E1)/input$para2E1^2-1/input$para1E1)*input$para1E1^2)*(1/input$para1E1-1))
+  
   output$credibleE1<-renderPlot({
     validate(
       need(
@@ -1139,7 +1252,11 @@ server <- function(input, output, session) {
         "Credible Levels must be positive values less than 1"
       ),
       need(
-        input$para1E1>0 && input$para2E1>0,
+        input$para1E1>0 && input$para1E1<1,
+        "Provide a valid prior"
+      ),
+      need(
+        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
         "Provide a valid prior"
       )
     )
@@ -1148,58 +1265,105 @@ server <- function(input, output, session) {
     # density
     priory<-dbeta(
       x=prange, 
-      shape1 = input$para1E1, 
-      shape2 = input$para2E1
+      shape1 = s1E(), 
+      shape2 = s2E()
     )
     x<-prange
     priordata<-as.data.frame(cbind(x,priory))
     ###posterior
     posteriory<-dbeta(
       x=prange, 
-      shape1 = input$para1E1 + 16,
-      shape2 = input$para2E1 + 9
+      shape1 = s1E() + 16,
+      shape2 = s2E() + 9
     )
     posteriordata<-as.data.frame(cbind(x,posteriory))
-    ### credible interval
+    ### Credible region
     alphaB<-1-input$creE1
     ci<-qbeta(
       c(alphaB/2,1-alphaB/2),
-      shape1 =input$para1E1 + 16,
-      shape2 =input$para2E1 + 9)
+      shape1 =s1E() + 16,
+      shape2 =s2E() + 9)
+    mllE1<-posteriordata[which.max(posteriordata$posteriory),]
+    mle<-
+      if(input$para1E1==1/2 && input$para2E1==0.289){
+          geom_segment(
+            aes(x=mllE1$x,y=0,xend=mllE1$x,yend=mllE1$posteriory,colour = "Max Log-Likelihood",linetype = "Max Log-Likelihood"),
+            size = 1
+          )
+    }
     ### combined plot
-    combined<-
+    combined1<-
       ggplot()+
       geom_line(
         data=priordata,
-        mapping = aes(x=x,y=priory,colour = "Prior")
+        mapping = aes(x=x,y=priory,colour = "Prior",linetype = "Prior")
       )+
       geom_line(
         data=posteriordata,
-        mapping = aes(x=x,y=posteriory,colour = "Posterior")
-      )+
+        mapping = aes(x=x,y=posteriory,colour = "Posterior", linetype ="Posterior")
+      )
+    combined<-
+      combined1+
       geom_segment(
-        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region"),
+        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region", linetype = "Credible region"),
         size = 1
       )+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Credible region", linetype = "Credible region"),
+        height=0.05*layer_scales(combined1)$y$get_limits()[2],
+        size=1
+      )+
+      mle+
       labs(
         title = "Prior and Posterior",
         x = "Proportion p", 
         y = "Density",
         alt = "The plot combined the prior distribution and the posterior plot"
       )+
-      scale_x_continuous(expand = expansion(mult = 0)) +
+      scale_x_continuous(
+        limits = c(0, 1),
+        expand = expansion(mult =0, add = 0),
+        breaks = seq.int(from = 0, to = 1, by = 0.2),
+        labels = c("0","0.2","0.4","0.6", "0.8", "1")
+      )+
       scale_y_continuous(expand = expansion(mult = .05))+
       scale_color_manual(
         name = NULL,
-        values = boastUtils::psuPalette
+        values = c(
+          "Credible region" = psuPalette[1],
+          "Prior" = psuPalette[3],
+          "Posterior" = psuPalette[2],
+          "Max Log-Likelihood" = "blue"
+        )
+      )+
+      scale_linetype_manual(
+        name = NULL,
+        values = c(
+          "Credible region" = "solid",
+          "Prior" = "solid",
+          "Posterior" = "solid",
+          "Max Log-Likelihood" = "dashed"
+        )
       )+
       theme_bw()+
       theme(
         plot.caption = element_text(size = 18),
         text = element_text(size = 18),
         axis.title = element_text(size = 16),
-        legend.position = "bottom"
+        legend.position = "bottom",
+        plot.margin = margin(
+          t=0,
+          b=0,
+          r=1,
+          l=1.5,
+          unit = "cm"
+        )
       )
+    playplots$credible<-combined
     return(combined)
   })
   output$bfE1<-renderPlotly({
@@ -1209,7 +1373,11 @@ server <- function(input, output, session) {
       "Credible Levels must be positive values less than 1"
       ),
       need(
-        input$para1E1>0 && input$para2E1>0,
+        input$para1E1>0 && input$para1E1<1,
+        "Provide a valid prior"
+      ),
+      need(
+        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
         "Provide a valid prior"
       )
     )
@@ -1299,7 +1467,11 @@ server <- function(input, output, session) {
         ""
       ),
       need(
-        input$para1E1>0 && input$para2E1>0,
+        input$para1E1>0 && input$para1E1<1,
+        ""
+      ),
+      need(
+        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
         ""
       )
     )
@@ -1307,14 +1479,22 @@ server <- function(input, output, session) {
     alphaB<-1-input$creE1
     ci<-qbeta(
       c(alphaB/2,1-alphaB/2),
-      shape1 =input$para1E1 + 16,
-      shape2 =input$para2E1 + 9)
+      shape1 =s1E() + 16,
+      shape2 =s2E() + 9)
     c1<-paste("Credible region"," lower bound",sep = "<br>")
     c2<-paste("Credible region"," upper bound",sep = "<br>")
     ctable<-matrix(c(round(ci[1],3),round(ci[2],3)),nrow=1)
     colnames(ctable)<-c(c1,c2)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
+  
+  output$plotsgroup1E1<-renderPlot({
+    gridExtra::grid.arrange(playplots$credible,ncol=1)
+  })
+  
+  output$plotsgroup2E1<-renderPlot({
+    gridExtra::grid.arrange(playplots$pvaluefunction,ncol=1)
+  })
   
   # HT & BI Page----
   ## Binomial ----
@@ -1343,6 +1523,36 @@ server <- function(input, output, session) {
       )
     }
   )
+  
+  ## parameters range
+  ## sd < sqrt(mu(1-mu))
+  observeEvent(
+    eventExpr = input$para1B1,
+    handlerExpr = {
+      updateSliderInput(
+        session = session,
+        inputId = "para2B1",
+        label = "SD \u03C3",
+        max = round(sqrt(input$para1B1*(1-input$para1B1)),2)
+        )
+    }
+  )
+  observeEvent(
+    eventExpr = input$nonpriorB1,
+    handlerExpr = {
+        updateSliderInput(
+          session = session,
+          inputId = "para1B1",
+          value = 1/2
+        )
+        updateSliderInput(
+          session = session,
+          inputId = "para2B1",
+          value = sqrt(1/12)
+        )
+    }
+  )
+  
   ### Update inputs----
   ### Frequentist side
   trueF1<-eventReactive({
@@ -1384,20 +1594,20 @@ server <- function(input, output, session) {
     input$trueB1
   }
   )
-  
+  ## mu -> shape1
   para1B1<-eventReactive({
     input$simb1
   },
   valueExpr = {
-    input$para1B1
+    ((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2
   }
   )
-  
+  ## sd ->shape2
   para2B1<-eventReactive({
     input$simb1
   },
   valueExpr = {
-    input$para2B1
+    (((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2)*(1/input$para1B1-1)
   }
   )
   
@@ -1532,7 +1742,10 @@ server <- function(input, output, session) {
         size = 1,
         alpha = 0.5
       )+
-      scale_x_continuous(expand = expansion(mult = 0)) +
+      scale_x_continuous(
+        limits = xlimP,
+        expand = expansion(mult =0, add = 0)
+      )+
       scale_y_continuous(expand = expansion(mult = .05))+
       labs(
         title = "P-value Function",
@@ -1543,6 +1756,15 @@ server <- function(input, output, session) {
       geom_segment(
         aes(x=ciP[1],y=0,xend=ciP[2],yend=0,colour = "Confidence interval"),
         size = 1
+      )+
+      geom_point(
+        mapping=aes(x=c(ciP[1],ciP[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ciP[1],xmax=ciP[2],y=0,colour = "Confidence interval"),
+        height=0.05*1,
+        size=1
       )+
       geom_segment(
         aes(x = xlimP[1], y = 1, xend = mean(simulationF1()), yend = 1, colour = "Observed estimate")
@@ -1622,9 +1844,11 @@ server <- function(input, output, session) {
     colnames(ctable)<-c("p-value",c2,c3)
     ctable
   },bordered = TRUE,sanitize.text.function=identity)
-  
 
   #### Bayes Side----
+  ## parameters
+  s1<-reactive(((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2)
+  s2<-reactive((((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2)*(1/input$para1B1-1))
   ## sample
   simulationB1<-eventReactive(
     eventExpr = input$simb1,
@@ -1632,7 +1856,6 @@ server <- function(input, output, session) {
       sample(c(0,1),size=nB1(),prob=c(1-trueB1(),trueB1()),replace = TRUE)
     }
   )
-  
   output$credibleB1<-renderPlot({
     validate(
       need(
@@ -1648,7 +1871,11 @@ server <- function(input, output, session) {
         message = "Provide a true p between (0,1)"
       ),
       need(
-        input$para1B1>0 && input$para2B1>0,
+        input$para1B1>0 && input$para1B1<1,
+        "Provide a valid prior"
+      ),
+      need(
+        input$para2B1>0 && input$para2B1<sqrt(input$para1B1*(1-input$para1B1)),
         "Provide a valid prior"
       ),
       need(
@@ -1669,39 +1896,60 @@ server <- function(input, output, session) {
     # density
     priory<-dbeta(
       x=prange, 
-      shape1 = input$para1B1, 
-      shape2 = input$para2B1
+      shape1 = s1(), 
+      shape2 = s2()
     )
     x<-prange
     priordata<-as.data.frame(cbind(x,priory))
     ###posterior
     posteriory<-dbeta(
       x=prange, 
-      shape1 = input$para1B1 + sum(simulationB1()),
-      shape2 = input$para2B1 + nB1() - sum(simulationB1())
+      shape1 =s1() + sum(simulationB1()),
+      shape2 =s2() + nB1() - sum(simulationB1())
     )
     posteriordata<-as.data.frame(cbind(x,posteriory))
-    ### credible interval
+    ### Credible region
     alphaB<-1-input$clB1
     ci<-qbeta(
       c(alphaB/2,1-alphaB/2),
-      shape1 =input$para1B1 + sum(simulationB1()),
-      shape2 =input$para2B1 + nB1() - sum(simulationB1()))
+      shape1 =s1() + sum(simulationB1()),
+      shape2 =s2() + nB1() - sum(simulationB1()))
+    # MLE
+    mllB1<-posteriordata[which.max(posteriordata$posteriory),]
+    mleB1<-
+      if(input$para1B1==0.5 && input$para2B1==0.289){
+        geom_segment(
+          aes(x=mllB1$x,y=0,xend=mllB1$x,yend=mllB1$posteriory,colour = "Max Log-Likelihood",linetype ="Max Log-Likelihood"),
+          size = 1
+        )
+      }
     ### combined plot
-    combined<-
+    combined1<-
       ggplot()+
       geom_line(
         data=priordata,
-        mapping = aes(x=x,y=priory,colour = "Prior")
+        mapping = aes(x=x,y=priory,colour = "Prior", linetype="Prior")
       )+
       geom_line(
         data=posteriordata,
-        mapping = aes(x=x,y=posteriory,colour = "Posterior")
-      )+
+        mapping = aes(x=x,y=posteriory,colour = "Posterior", linetype="Posterior")
+      )
+    combined<-
+      combined1+
       geom_segment(
-        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region"),
+        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region", linetype ="Credible region"),
         size = 1
         )+
+      mleB1+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Credible region", linetype = "Credible region"),
+        height=0.05*layer_scales(combined1)$y$get_limits()[2],
+        size=1
+      )+
       labs(
         title = "Prior and Posterior",
         x = "Proportion p", 
@@ -1712,7 +1960,21 @@ server <- function(input, output, session) {
       scale_y_continuous(expand = expansion(mult = .05))+
       scale_color_manual(
         name = NULL,
-        values = boastUtils::psuPalette
+        values = c(
+          "Credible region" = psuPalette[1],
+          "Prior" = psuPalette[3],
+          "Posterior" = psuPalette[2],
+          "Max Log-Likelihood" = "blue"
+        )
+      )+
+      scale_linetype_manual(
+        name = NULL,
+        values = c(
+          "Credible region" = "solid",
+          "Prior" = "solid",
+          "Posterior" = "solid",
+          "Max Log-Likelihood" = "dashed"
+        )
       )+
       theme_bw()+
       theme(
@@ -1739,7 +2001,11 @@ server <- function(input, output, session) {
         message = "Provide a true p between (0,1)"
       ),
       need(
-        input$para1B1>0 && input$para2B1>0,
+        input$para1B1>0 && input$para1B1<1,
+        "Provide a valid prior"
+      ),
+      need(
+        input$para2B1>0 && input$para2B1<sqrt(input$para1B1*(1-input$para1B1)),
         "Provide a valid prior"
       ),
       need(
@@ -1873,7 +2139,11 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$para1B1>0 && input$para2B1>0,
+        input$para1B1>0 && input$para1B1<1,
+        ""
+      ),
+      need(
+        input$para2B1>0 && input$para2B1<sqrt(input$para1B1*(1-input$para1B1)),
         ""
       ),
       need(
@@ -1903,8 +2173,8 @@ server <- function(input, output, session) {
     alphaB<-1-input$clB1
     ci<-qbeta(
       c(alphaB/2,1-alphaB/2),
-      shape1 =input$para1B1 + sum(simulationB1()),
-      shape2 =input$para2B1 + nB1() - sum(simulationB1()))
+      shape1 =s1() + sum(simulationB1()),
+      shape2 =s2() + nB1() - sum(simulationB1()))
     ctable<-matrix(c(round(pvpll,3),round(ci[1],3),round(ci[2],3)),nrow=1)
     c2<-paste("Credible region"," lower bound",sep = "<br>")
     c3<-paste("Credible region"," upper bound",sep = "<br>")
@@ -1937,6 +2207,7 @@ server <- function(input, output, session) {
       )
     }
   )
+  
   ### Update inputs----
   ### Frequentist side
   trueF2<-eventReactive({
@@ -2127,10 +2398,11 @@ server <- function(input, output, session) {
         size = 1,
         alpha = 0.5
       )+
-      lims(
-        x=xlim,
-        y=c(0,1)
+      scale_x_continuous(
+        limits = xlim,
+        expand = expansion(mult =0, add = 0)
       )+
+      scale_y_continuous(expand = expansion(mult = .05))+
       labs(
         title = "P-value Function",
         x = "Null hypothesis mean", 
@@ -2140,6 +2412,15 @@ server <- function(input, output, session) {
       geom_segment(
         aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Confidence interval"),
         size = 1
+      )+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Confidence interval"),
+        height=0.05*1,
+        size=1
       )+
       geom_segment(
         aes(x = xlim[1], y = 1, xend = mean(simulationF2()), yend = 1, colour = "Observed estimate")
@@ -2246,10 +2527,6 @@ server <- function(input, output, session) {
         message = "Provide a true \u03BB larger than 0"
       ),
       need(
-        input$para1B2>0 && input$para2B2>0,
-        "Provide a valid prior"
-      ),
-      need(
         input$clB2!=0 && input$clB2!=1,
         "Credible Levels must be positive values less than 1"
       )
@@ -2279,7 +2556,7 @@ server <- function(input, output, session) {
       rate = input$para2B2 + nB2()
     )
     posteriordata<-as.data.frame(cbind(x,posteriory))
-    ### credible interval
+    ### Credible region
     alphaB<-1-input$clB2
     ci<-qgamma(
       c(alphaB/2,1-alphaB/2),
@@ -2287,19 +2564,30 @@ server <- function(input, output, session) {
       rate = input$para2B2 + nB2()
     )
     ### combined plot
-    combined<-
+    combined1<-
       ggplot()+
       geom_line(
         data=priordata,
-        mapping = aes(x=x,y=priory,colour = "Prior")
+        mapping = aes(x=x,y=priory,colour = "Prior", linetype = "Prior")
       )+
       geom_line(
         data=posteriordata,
-        mapping = aes(x=x,y=posteriory,colour = "Posterior")
-      )+
+        mapping = aes(x=x,y=posteriory,colour = "Posterior", linetype="Posterior")
+      )
+    combined<-
+      combined1+
       geom_segment(
-        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region"),
+        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region", linetype = "Credible region"),
         size = 1
+      )+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Credible region",linetype = "Credible region"),
+        height=0.05*layer_scales(combined1)$y$get_limits()[2],
+        size=1
       )+
       labs(
         title = "Prior and Posterior",
@@ -2311,7 +2599,19 @@ server <- function(input, output, session) {
       scale_y_continuous(expand = expansion(mult = .05))+
       scale_color_manual(
         name = NULL,
-        values = boastUtils::psuPalette
+        values = c(
+          "Credible region" = psuPalette[1],
+          "Prior" = psuPalette[3],
+          "Posterior" = psuPalette[2]
+        )
+      )+
+      scale_linetype_manual(
+        name = NULL,
+        values = c(
+          "Credible region" = "solid",
+          "Prior" = "solid",
+          "Posterior" = "solid"
+        )
       )+
       theme_bw()+
       theme(
@@ -2336,10 +2636,6 @@ server <- function(input, output, session) {
       need(
         expr = input$trueB2 != 0 , 
         message = "Provide a true \u03BB larger than 0"
-      ),
-      need(
-        input$para1B2>0 && input$para2B2>0,
-        "Provide a valid prior"
       ),
       need(
         input$clB2!=0 && input$clB2!=1,
@@ -2462,10 +2758,6 @@ server <- function(input, output, session) {
         message = ""
       ),
       need(
-        input$para1B2>0 && input$para2B2>0,
-        ""
-      ),
-      need(
         input$clB2!=0 && input$clB2!=1,
         ""
       )
@@ -2528,6 +2820,7 @@ server <- function(input, output, session) {
       )
     }
   )
+
   ### Update inputs----
   ### Frequentist side
   trueF3<-eventReactive({
@@ -2694,10 +2987,11 @@ server <- function(input, output, session) {
         size = 1,
         alpha = 0.5
       )+
-      lims(
-        x=xlim,
-        y=c(0,1)
+      scale_x_continuous(
+        limits = xlim,
+        expand = expansion(mult =0, add = 0)
       )+
+      scale_y_continuous(expand = expansion(mult = .05))+
       labs(
         title = "P-value Function",
         x = "Null hypothesis mean", 
@@ -2707,6 +3001,15 @@ server <- function(input, output, session) {
       geom_segment(
         aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Confidence interval"),
         size = 1
+      )+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Confidence interval"),
+        height=0.05*1,
+        size=1
       )+
       geom_segment(
         aes(x = xlim[1], y = 1, xend = mean(simulationF3()), yend = 1, colour = "Observed estimate")
@@ -2831,7 +3134,7 @@ server <- function(input, output, session) {
       sd = sqrt(sd2post)
     )
     posteriordata<-as.data.frame(cbind(x,posteriory))
-    ### credible interval
+    ### Credible region
     alphaB<-1-input$clB3
     ci<-qnorm(
       c(alphaB/2,1-alphaB/2),
@@ -2839,19 +3142,30 @@ server <- function(input, output, session) {
       sd = sqrt(sd2post)
     )
     ### combined plot
-    combined<-
+    combined1<-
       ggplot()+
       geom_line(
         data=priordata,
-        mapping = aes(x=x,y=priory,colour = "Prior")
+        mapping = aes(x=x,y=priory,colour = "Prior",linetype="Prior")
       )+
       geom_line(
         data=posteriordata,
-        mapping = aes(x=x,y=posteriory,colour = "Posterior")
-      )+
+        mapping = aes(x=x,y=posteriory,colour = "Posterior", linetype="Posterior")
+      )
+    combined<-
+      combined1+
       geom_segment(
-        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region"),
+        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region",linetype = "Credible region"),
         size = 1
+      )+
+      geom_point(
+        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
+        alpha=0
+      )+
+      geom_errorbarh(
+        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Credible region", linetype ="Credible region"),
+        height=0.05*layer_scales(combined1)$y$get_limits()[2],
+        size=1
       )+
       labs(
         title = "Prior and Posterior",
@@ -2863,7 +3177,19 @@ server <- function(input, output, session) {
       scale_y_continuous(expand = expansion(mult = .05))+
       scale_color_manual(
         name = NULL,
-        values = boastUtils::psuPalette
+        values = c(
+          "Credible region" = psuPalette[1],
+          "Prior" = psuPalette[3],
+          "Posterior" = psuPalette[2]
+        )
+      )+
+      scale_linetype_manual(
+        name = NULL,
+        values = c(
+          "Credible region" = "solid",
+          "Prior" = "solid",
+          "Posterior" = "solid"
+        )
       )+
       theme_bw()+
       theme(
