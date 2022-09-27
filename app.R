@@ -27,7 +27,7 @@ ui <- list(
       tags$li(
         class = "dropdown",
         tags$a(href = 'https://shinyapps.science.psu.edu/',
-               icon("home")
+               icon("house")
         )
       )
     ),
@@ -36,9 +36,9 @@ ui <- list(
       width = 250,
       sidebarMenu(
         id = "pages",
-        menuItem("Overview", tabName = "overview", icon = icon("tachometer-alt")),
+        menuItem("Overview", tabName = "overview", icon = icon("gauge-high")),
         menuItem("Prerequisites", tabName = "prerequisites", icon = icon("book")),
-        menuItem("Example",tabName = "example",icon = icon("book-reader")),
+        menuItem("Example",tabName = "example",icon = icon("book-open-reader")),
         menuItem("Hypothesis Testing", tabName = "frequentist", icon = icon("wpexplorer")),
         menuItem("Bayesian Inference", tabName = "bayesian", icon = icon("wpexplorer")),
         menuItem("References", tabName = "references", icon = icon("leanpub"))
