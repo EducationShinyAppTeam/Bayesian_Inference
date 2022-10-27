@@ -242,7 +242,7 @@ ui <- list(
                   inputId = "clE1",
                   label = "Confidence level",
                   min = 0.6,
-                  max = 1,
+                  max = 0.99,
                   step = 0.01,
                   value = 0.95
                 ),
@@ -320,7 +320,7 @@ ui <- list(
                   label = "Credible level",
                   value = 0.95,
                   min = 0.6,
-                  max = 1,
+                  max = 0.99,
                   step = 0.01
                 ),
                 checkboxInput(
@@ -391,7 +391,7 @@ ui <- list(
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
@@ -472,7 +472,7 @@ ui <- list(
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
@@ -560,7 +560,7 @@ ui <- list(
                       label = "Confidence level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
@@ -680,7 +680,7 @@ ui <- list(
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
@@ -782,7 +782,7 @@ ui <- list(
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
@@ -893,7 +893,7 @@ ui <- list(
                       label = "Credible level 1-\u03B1",
                       value = 0.95,
                       min = 0.6,
-                      max = 1,
+                      max = 0.99,
                       step = 0.01
                     ),
                     sliderInput(
