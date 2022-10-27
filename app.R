@@ -155,7 +155,10 @@ ui <- list(
             collapsed = TRUE,
             width = '100%',
             p("The distribution of the parameter after observing new data."), 
-            p(style="text-align: center;",withMathJax("$$P(\u03BC|x) = \\frac{P(\u03BC)P(x|\u03BC)}{P(x)}$$"))
+            p(
+              style="text-align: center;",
+              withMathJax("$$P(\u03BC|x) = \\frac{P(\u03BC)P(x|\u03BC)}{P(x)}$$")
+              )
           ),
           box(
             title = strong("Credible region at level 1-\u03B1"),
@@ -444,7 +447,8 @@ ui <- list(
                 title = "Poisson",
                 value = "poiF",
                 h3("Scenario"),
-                HTML(paste0("You like to eat at your favorite sushi restaurant on Friday 
+                HTML(
+                  paste0("You like to eat at your favorite sushi restaurant on Friday 
                   evenings so, when you move into a new apartment, you wonder 
                   about the availability of ride service vehicles to take you 
                   across town to the restaurant. The previous tenant claimed that 
@@ -452,11 +456,11 @@ ui <- list(
                   the apartment 90% of the time. Knowing that the number of available 
                   vehicles within a 1-mile radius should be well modeled by a Poisson 
                   distribution, this implies that the mean \u03BB would be about 2.3 
-                  (since e", tags$sup(-2.3), " ≈ 0.1). You wonder if the value of \u03BB = 2.3 will 
-                  be compatible with the data you are about to collect on Friday 
-                  evenings going forward. Use the sliders to explore how your 
-                  decision about the sample size and the true value of \u03BB will 
-                  affect the result of an hypothesis test.")),
+                  (since e", tags$sup(-2.3), " ≈ 0.1). You wonder if the value of 
+                  \u03BB = 2.3 will be compatible with the data you are about to 
+                  collect on Friday evenings going forward. Use the sliders to 
+                  explore how your decision about the sample size and the true 
+                  value of \u03BB will affect the result of an hypothesis test.")),
                 br(),
                 column(
                   width = 4,
@@ -543,7 +547,8 @@ ui <- list(
                 can be modeled as a normal distribution with an unknown mean \u03BC
                 and a standard deviation of about 0.058 (= ln(1.06)). Use the sliders 
                 to explore how a hypothesis test and confidence interval for \u03BC might 
-                depend on the sample size, the confidence level, and the true value of \u03BC.")),
+                depend on the sample size, the confidence level, and the true value 
+                of \u03BC.")),
                 br(),
                 column(
                   width = 4,
@@ -632,11 +637,11 @@ ui <- list(
                   Since the vegetable patty made up about a quarter of sales at 
                   the old location, the best prior information would have 
                   \u03B2 = 3\u03B1 (so the expected value of p would be 0.25 since 
-                  E(p)=\u03B1/(\u03B1+\u03B2)). Knowing that this may be off by a good deal, 
-                  the owner wants to have a standard deviation that is also 
-                  about 0.25. The owner is about to take data at the new location.
-                  Use the slider to explore how the researcher's decisions about 
-                  the sample size and prior knowledge affect the result."),
+                  E(p)=\u03B1/(\u03B1+\u03B2)). Knowing that this may be off by 
+                  a good deal, the owner wants to have a standard deviation that 
+                  is also about 0.25. The owner is about to take data at the new 
+                  location.Use the slider to explore how the researcher's decisions 
+                  about the sample size and prior knowledge affect the result."),
                 br(),
                 column(
                   width = 4,
@@ -740,12 +745,15 @@ ui <- list(
                   Uber available on Friday evenings within 1 mile of the apartment 
                   90% of the time.Knowing that the number of available vehicles 
                   within a 1-mile radius should be well modeled by a Poisson distribution, 
-                  this implies that the mean \u03BB would be about 2.3 (since e", tags$sup(-2.3), " ≈ 0.1). 
-                  Of course, there is still a great deal of uncertainty about the value of 
-                  \u03BB that you model by assuming \u03BB follows a gamma distribution. 
-                  Before taking any data, you need to decide on the parameters of this prior distribution and how much data to collect. 
-                  Use the sliders to see how your decisions might affect the posterior 
-                  distribution of \u03BB and how much you might favor one value of \u03BB over another.")),
+                  this implies that the mean \u03BB would be about 2.3 (since e", 
+                  tags$sup(-2.3), " ≈ 0.1). Of course, there is still a great deal 
+                  of uncertainty about the value of \u03BB that you model by 
+                  assuming \u03BB follows a gamma distribution. Before taking any 
+                  data, you need to decide on the parameters of this prior 
+                  distribution and how much data to collect. Use the sliders to 
+                  see how your decisions might affect the posterior distribution 
+                  of \u03BB and how much you might favor one value of \u03BB over 
+                  another.")),
                 br(),
                 column(
                   width = 4,
@@ -1154,7 +1162,7 @@ server <- function(input, output, session) {
       scale_y_continuous(
         expand = expansion(mult = 0.05),
         breaks = seq.int(from = 0, to = 1, by = 0.2),
-        labels = c("0","0.2","0.4","0.6", "0.8", "1"),
+        labels = c("0","0.2","0.4","0.6", "0.8", "1")
       )+
       labs(
         title = "P-value Function",
@@ -1287,7 +1295,14 @@ server <- function(input, output, session) {
     mle<-
       if(input$para1E1==1/2 && input$para2E1==0.289){
           geom_segment(
-            aes(x=mllE1$x,y=0,xend=mllE1$x,yend=mllE1$posteriory,colour = "Max Log-Likelihood",linetype = "Max Log-Likelihood"),
+            aes(
+              x=mllE1$x,
+              y=0,
+              xend=mllE1$x,
+              yend=mllE1$posteriory,
+              colour = "Max Log-Likelihood",
+              linetype = "Max Log-Likelihood"
+              ),
             size = 1
           )
     }
@@ -1450,10 +1465,12 @@ server <- function(input, output, session) {
           color = "blue")
         )%>%
       config(displaylogo=FALSE)%>%
-      config(modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
-                                        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
+      config(
+        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
+        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
       layout(
-        title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",font=list(size=18),xanchor="right"),
+        title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",
+                   font=list(size=18),xanchor="right"),
         xaxis=list(title="Proportion p",titlefont=list(size=16)),
         yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
@@ -1919,7 +1936,14 @@ server <- function(input, output, session) {
     mleB1<-
       if(input$para1B1==0.5 && input$para2B1==0.289){
         geom_segment(
-          aes(x=mllB1$x,y=0,xend=mllB1$x,yend=mllB1$posteriory,colour = "Max Log-Likelihood",linetype ="Max Log-Likelihood"),
+          aes(
+            x=mllB1$x,
+            y=0,
+            xend=mllB1$x,
+            yend=mllB1$posteriory,
+            colour = "Max Log-Likelihood",
+            linetype ="Max Log-Likelihood"
+            ),
           size = 1
         )
       }
@@ -2105,10 +2129,12 @@ server <- function(input, output, session) {
           color = "blue")
       )%>%
       config(displaylogo=FALSE)%>%
-      config(modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
-                                        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
+      config(
+        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
+        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
       layout(
-        title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",font=list(size=18),xanchor="right"),
+        title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",
+                   font=list(size=18),xanchor="right"),
         xaxis=list(title="Proportion p",titlefont=list(size=16)),
         yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
@@ -2732,10 +2758,12 @@ server <- function(input, output, session) {
           color = "blue")
       )%>%
       config(displaylogo=FALSE)%>%
-      config(modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
-                                        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
+      config(
+        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
+        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
       layout(
-        title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u3BB<sub>c</sub>",font=list(size=18),xanchor="right"),
+        title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u3BB<sub>c</sub>",
+                   font=list(size=18),xanchor="right"),
         xaxis=list(title="Mean \u3BB",titlefont=list(size=16)),
         yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
@@ -3308,10 +3336,12 @@ server <- function(input, output, session) {
           color = "blue")
       )%>%
       config(displaylogo=FALSE)%>%
-      config(modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
-                                        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
+      config(
+        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
+        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
       layout(
-        title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u03BC<sub>c</sub>",font=list(size=18),xanchor="right"),
+        title=list(text="Log<sub>10</sub> Bayes Factor Compared to \u03BC<sub>c</sub>",
+                   font=list(size=18),xanchor="right"),
         xaxis=list(title="Mean \u03BC",titlefont=list(size=16)),
         yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
         showlegend=T,
