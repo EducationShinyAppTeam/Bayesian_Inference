@@ -6,10 +6,9 @@ library(shinyWidgets)
 library(boastUtils)
 library(ggplot2)
 library(dplyr)
-library(shinyjs)
 library(exactci)
 library(plotly)
-library(gridExtra)
+
 # Define UI for App ----
 ui <- list(
   ## Create the app page ----
@@ -56,9 +55,10 @@ ui <- list(
           tabName = "overview",
           withMathJax(),
           h1("Bayesian Inference and Hypothesis Testing"),
-          p("This app provides a comparison between traditional inference 
-            (e.g. P-values and confidence intervals); and Bayesian inference 
-            (e.g. Bayes Factors and credible regions)."),
+          p("This app provides a comparison between traditional (frequentist)
+            inference methods (e.g., ", tags$em("p"),"-values and confidence
+            intervals) and Bayesian inference methods (e.g., Bayes Factors and
+            credible regions)."),
           h2("Instructions"),
           p("In order to use this app more effectively, it is recommended to 
             explore in the following order."),
@@ -67,7 +67,6 @@ ui <- list(
             tags$li("When you're ready to start, use the left-hand menu to select 
                     which activity you wish to exlore.")
           ),
-            ##### Pre Button
           div(
             style = "text-align: center;",
             bsButton(
@@ -78,7 +77,6 @@ ui <- list(
               style = "default"
             )
           ),
-          ##### Create two lines of space
           br(),
           br(),
           h2("Acknowledgements"),
@@ -92,7 +90,7 @@ ui <- list(
             citeApp(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 7/29/2022 by JF.")
+            div(class = "updated", "Last Update: 11/29/2022 by NJH.")
           )
         ),
         #### Set up the Prerequisites Page ----
@@ -100,25 +98,26 @@ ui <- list(
           tabName = "prerequisites",
           withMathJax(),
           h2("Prerequisites"),
-          p("In order to get the most out of this app, 
-            please review the following rough explanations of terms"),
+          p("In order to get the most out of this app, please review the following
+            explanations of various terms by clicking on the plus signs to expand
+            the boxes."),
           box(
-            title = strong("P-value"),
+            title = strong(tags$em("P"),"-value"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            "The chance that the observed statistic is closer than a random value 
-            to what’s expected when the null is true."
+            "The probability that the test statistic takes on a value at least as
+            extreme as we observed when the hull hypothesis is true."
           ),
           box(
-            title = strong("Confidence interval at level 1-\u03B1"),
+            title = strong("\\((1-\\alpha)100\\)% Level Confidence Interval"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            "An interval of tested parameter values that give P-values greater 
-            than \u03B1."
+            "An interval of tested parameter values that give", tags$em("p"), 
+            "-values greater than \\(\\alpha\\)."
           ),
           box(
             title = strong("Likelihood"),
@@ -127,8 +126,7 @@ ui <- list(
             collapsed = TRUE,
             width = '100%',
             p("The distribution of the data given the parameter expressed as a function 
-            of the parameter."),
-            p(style="text-align: center;",withMathJax("$$L(\u03BC;x) = f(x|\u03BC)$$"))
+            of the parameter. \\[L\\left(\\mu; x\\right)=f\\left(x\\big|\\mu\\right)\\]")
           ),
           box(
             title = strong("Maximum Likelihood Estimate"),
@@ -145,8 +143,8 @@ ui <- list(
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            p("The distribution of the parameter prior to observing any new data."),
-            p(style="text-align: center;",withMathJax("$$P(\u03BC)$$"))
+            p("The distribution of the parameter prior to observing any new data;
+              often denoted as \\(P\\left(\\mu\\right)\\).")
           ),
           box(
             title = strong("Posterior"),
@@ -154,31 +152,31 @@ ui <- list(
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            p("The distribution of the parameter after observing new data."), 
-            p(
-              style="text-align: center;",
-              withMathJax("$$P(\u03BC|x) = \\frac{P(\u03BC)P(x|\u03BC)}{P(x)}$$")
-              )
+            p("The distribution of the parameter after observing new data. We
+              express this as \\[P\\left(\\mu\\big|x\\right)=\\frac{P(\\mu)
+              P\\left(x\\big|\\mu\\right)}{P(x)}\\]")
           ),
           box(
-            title = strong("Credible region at level 1-\u03B1"),
+            title = strong("\\(1-\\alpha\\) Level Credible Region"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            "An interval of parameter values that has a total posterior probability of 1-\u03B1."
+            "An interval of parameter values that has a total posterior
+            probability of \\(1-\\alpha\\)."
           ),
           box(
-            title = strong("Bayes factor"),
+            title = strong("Bayes Factor"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
             width = '100%',
-            p("The ratio of the Likelihood for one model compared to another."),
-            p(style="text-align: center;",withMathJax("$$\\frac{L(M1)}{L(M0)}$$"))
+            p("The ratio of the likelihood of one model (\\(M_1\\)) with respect
+              to the likelihood of another model (\\(M_0\\)): 
+              \\[\\frac{L\\left(M_1\\right)}{L\\left(M_0\\right)}\\]")
           ),
           box(
-            title = strong("Conjugate prior"),
+            title = strong("Conjugate Prior"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
@@ -188,14 +186,16 @@ ui <- list(
               (but with new parameters reflecting the information provided by the data). 
               Examples used in this app:"),
             tags$ul(
-              tags$li("The Beta distribution is a conjugate prior to the Binomial likelihood."),
-              tags$li("The Gamma distribution is a conjugate prior to the Poisson likelihood."),
-              tags$li("The Normal distribution is a conjugate prior to the Normal likelihood (known
-              variance case).")
+              tags$li("The Beta distribution is a conjugate prior to the Binomial
+                      likelihood."),
+              tags$li("The Gamma distribution is a conjugate prior to the Poisson
+                      likelihood."),
+              tags$li("The Normal distribution is a conjugate prior to the Normal
+                      likelihood (known variance case).")
             )
           ),
           box(
-            title = strong("Noninformative prior"),
+            title = strong("Noninformative Prior"),
             status = "primary",
             collapsible = TRUE,
             collapsed = TRUE,
@@ -211,29 +211,25 @@ ui <- list(
         tabItem(
           tabName = "example",
           withMathJax(),
-          h2("Example"),
-          fluidPage(
-            shinyjs::useShinyjs(),
-            p("Researchers at the University of 
-                  California at San Diego studied the degree to which people have 
-                  a resemblance to their purebred pet dogs. They theorized that 
-                  people tend to acquire breeds that have some similar traits to 
-                  themselves. Photographs were taken at dog parks separately of 
-                  people (waist up) and their pets; making sure to have different 
-                  backgrounds for the different pictures. Judges then looked at 
-                  pictures of each person and asked which of two dogs looked more 
-                  like them, their own pet or a randomly chosen purebred dog 
-                  photographed at the same dog park. Out of 25 human-dog pairs, 
-                  It turned out that the judges correctly  matched the person and 
-                  pet 16 times and chose the wrong dog in 9 cases. Let p = the true 
-                  proportion of times the judges can correctly guess which of 
-                  two dogs belongs to a particular person from the population 
-                  of purebred dog owners."),
-            br(),
-            p(tags$strong("Hypothesis Testing Side:"),"After observing the 
-                  data, we might seek a confidence interval for p or test 
-                  the null hypothesis that p = 0.5."),
-            br(),
+          h2("Example Comparing the Two Approaches"),
+          p("Researchers at the University of California at San Diego studied the
+            degree to which people have a resemblance to their purebred pet dogs.
+            They theorized that people tend to acquire breeds that have some
+            similar traits to themselves. Photographs were taken at dog parks
+            separately of people (waist up) and their pets; making sure to have
+            different backgrounds for the different pictures. Judges then looked
+            at pictures of each person and asked which of two dogs looked more 
+            like them, their own pet or a randomly chosen purebred dog photographed
+            at the same dog park. Out of 25 human-dog pairs, it turned out that
+            the judges correctly matched the person and dog 16 times and chose
+            the wrong dog in 9 cases. Let", tags$em("p"), "represent the true
+            proportion of times the judges can correctly guess which of two dogs
+            belongs to a particular person from the population of purebred dog
+            owners."),
+          h3("(Frequentist) Hypothesis Testing Approach"),
+          p("After observing the data, we might seek a confidence interval for",
+            tags$em("p"), "and/or test the null hypothesis that \\(p=0.5\\)."),
+          fluidRow(
             column(
               width = 4,
               offset = 0,
@@ -250,14 +246,12 @@ ui <- list(
                   inputId = "add1",
                   label = "Show Prior and Posterior plot",
                   value = FALSE
-                  ),
+                ),
                 withMathJax(
-                  p("Null Hypothesis"),
-                  p(HTML(paste0("p",tags$sub("0")," = 0.5"))),
-                  p("Sample Data"),
-                  p("\\(n =\\) ", 25),
-                  p("\\(x =\\) ", 16),
-                  p("\\(\\hat{p} =\\)",round(16/25,3))
+                  p("Null Hypothesis: \\(p_0=0.5\\)"),
+                  p("Results from Sample Data:"),
+                  p("\\(n = 25\\) judgements", br(), "\\(x = 16\\) correct pairings",
+                    br(), "\\(\\widehat{p}=0.64\\)")
                 )
               )
             ),
@@ -275,23 +269,24 @@ ui <- list(
                 condition = "input.results1E1==1",
                 tableOutput("httableE1")
               )
-            ),
-            br(),
-            p(tags$strong("Bayesian Inference Side:"),"Our initial uncertainty 
-                  about p might be quantified by a prior distribution using the 
-                  Beta distribution. After observing the data, we would look 
-                  at the posterior distribution of p and seek a Credible region. 
-                  To compare different models for what p might be with the specific 
-                  model that p = 0.5, we can use the Bayes Factor."),
-            br(),
+            )
+          ),
+          h3("Bayesian Inference Approach"),
+          p("Our initial uncertainty about", tags$em("p"), "might be quantified 
+            by a prior distribution using the Beta distribution. After observing
+            the data, we would look at the posterior distribution of", tags$em("p"),
+            "and seek a credible region. To compare different models for what",
+            tags$em("p"), "might be with the specific model that p = 0.5,
+            we can use the Bayes Factor."),
+          fluidRow(
             column(
               width = 4,
               offset = 0,
               wellPanel(
-                tags$strong("Beta prior"),
+                tags$strong("Beta Prior"),
                 sliderInput(
                   inputId = "para1E1",
-                  label = "Mean \u03BC",
+                  label = "Mean, \\(\\mu\\)",
                   value = 0.5,
                   min = 0,
                   max = 1,
@@ -299,21 +294,19 @@ ui <- list(
                 ),
                 sliderInput(
                   inputId = "para2E1",
-                  label = "SD \u03C3",
+                  label = "SD, \\(\\sigma\\)",
                   value = 0.289,
                   min = 0,
                   max = 0.5,
                   step = 0.001
                 ),
-                div(
-                  style = "text-align: center;",
-                  bsButton(
-                    inputId = "nonpriorE1",
-                    label = "Noninformative Prior",
-                    size = "default",
-                    style = "default"
-                  )
+                bsButton(
+                  inputId = "nonpriorE1",
+                  label = "Use a noninformative prior",
+                  size = "large",
+                  style = "default"
                 ),
+                br(),
                 br(),
                 sliderInput(
                   inputId = "creE1",
@@ -327,15 +320,12 @@ ui <- list(
                   inputId = "add2",
                   label = "Show P-value Function plot",
                   value = FALSE
-                  ),
+                ),
                 withMathJax(
-                  p("Model for comparison "),
-                  p(HTML(paste0("p",tags$sub("c")," = 0.5"))),
-                  p("Sample Data"),
-                  p("\\(n =\\) ", 25),
-                  p("\\(x =\\) ", 16),
-                  HTML(paste("\\(\\hat{p} =\\)",round(16/25,3)))
-                
+                  p("Model for comparison: \\(p_c=0.5\\)"),
+                  p("Results from Sample Data:"),
+                  p("\\(n = 25\\) judgements", br(), "\\(x = 16\\) correct pairings",
+                    br(), "\\(\\widehat{p}=0.64\\)")
                 )
               )
             ),
@@ -361,257 +351,266 @@ ui <- list(
         tabItem(
           tabName = "frequentist",
           withMathJax(),
-          h2("Hypothesis Testing"),
-          fluidPage(
-            tabsetPanel(
-              id = "scenarioF",
-              type = "tabs",
-              ##### Binomial context----
-              tabPanel(
-                title = "Binomial",
-                value = "bioF",
-                h3("Scenario"),
-                p("A food truck sells hot sandwiches  with a choice of a chicken, 
+          h2("(Frequentist) Hypothesis Testing"),
+          p("The following tabs each present a different scenario where we can 
+            use (frequentist) hypothesis testing methods to learn about the
+            situation presented. Use the sliders to set up a simulation and conduct
+            a hypothesis test."),
+          br(),
+          tabsetPanel(
+            id = "scenarioF",
+            type = "tabs",
+            ##### Binomial context----
+            tabPanel(
+              title = "Binomial",
+              value = "bioF",
+              br(),
+              p("A food truck sells hot sandwiches with a choice of a chicken, 
                 fish, or vegetable patty. The owner of the truck is thinking of 
                 moving its location closer to a downtown museum and wonders if 
-                that might change the chance, p, that a customer will order the 
-                vegetable patty (vegetable patties make up a quarter of sales at 
-                the current location). The owner wonders if the value of p at the 
-                current location is compatible with the data about to be taken at 
-                the new location. Use the slider to explore how the researcher's
-                decision about the sample size affects the result."),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### input parts----
-                    sliderInput(
-                      inputId = "clF1",
-                      label = "Confidence level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nF1",
-                      label = "Sample size",
-                      value = 25,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullF1",
-                      label = HTML(paste0("Null hypothesis p",tags$sub("0"))),
-                      value = 0.01,
-                      min = 0,
-                      max = 1,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "trueF1",
-                      label = "True p",
-                      value = 0.01,
-                      min = 0,
-                      max = 1,
-                      step = 0.01
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simf1",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
+                that might change the chance,", tags$em("p"), ", that a customer
+                will order the vegetable patty (vegetable patties make up a quarter
+                of sales at the current location). The owner wonders if the value
+                of", tags$em("p"), "at the current location is compatible with
+                the data about to be taken at the new location. Use the sliders
+                to explore how the owner's decision about the sample size affects
+                the result."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### input parts----
+                  sliderInput(
+                    inputId = "clF1",
+                    label = "Confidence level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nF1",
+                    label = "Sample size",
+                    value = 25,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullF1",
+                    label = "Null hypothesis, \\(p_0\\)",
+                    value = 0.01,
+                    min = 0,
+                    max = 1,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "trueF1",
+                    label = "True value of \\(p\\)",
+                    value = 0.01,
+                    min = 0,
+                    max = 1,
+                    step = 0.01
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simf1",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
                     )
-                  )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### output----
-                  plotOutput("pvalueFunction1"),
-                  checkboxInput("resultsF1",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsF1==1",
-                    tableOutput("pvalueF1")
                   )
                 )
               ),
-              tabPanel(
-                ##### Poisson context----
-                title = "Poisson",
-                value = "poiF",
-                h3("Scenario"),
-                HTML(
-                  paste0("You like to eat at your favorite sushi restaurant on Friday 
-                  evenings so, when you move into a new apartment, you wonder 
-                  about the availability of ride service vehicles to take you 
-                  across town to the restaurant. The previous tenant claimed that 
-                  there was an Uber available on Friday evenings within 1 mile of 
-                  the apartment 90% of the time. Knowing that the number of available 
-                  vehicles within a 1-mile radius should be well modeled by a Poisson 
-                  distribution, this implies that the mean \u03BB would be about 2.3 
-                  (since e", tags$sup(-2.3), " ≈ 0.1). You wonder if the value of 
-                  \u03BB = 2.3 will be compatible with the data you are about to 
-                  collect on Friday evenings going forward. Use the sliders to 
-                  explore how your decision about the sample size and the true 
-                  value of \u03BB will affect the result of an hypothesis test.")),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### input parts----
-                    sliderInput(
-                      inputId = "clF2",
-                      label = "Confidence level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nF2",
-                      label = "Sample size",
-                      value = 25,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullF2",
-                      label = HTML(paste0("Null hypothesis \u03BB",tags$sub("0"))),
-                      value = 0.1,
-                      min = 0,
-                      max = 10,
-                      step = 0.1
-                    ),
-                    sliderInput(
-                      inputId = "trueF2",
-                      label = "True \u03BB",
-                      value = 0.1,
-                      min = 0,
-                      max = 10,
-                      step = 0.1
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simf2",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
+              column(
+                width = 8,
+                offset = 0,
+                ###### output----
+                plotOutput("pvalueFunction1"),
+                checkboxInput("resultsF1",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsF1==1",
+                  tableOutput("pvalueF1")
+                )
+              )
+            ),
+            tabPanel(
+              ##### Poisson context----
+              title = "Poisson",
+              value = "poiF",
+              br(),
+              p("You like to eat at your favorite sushi restaurant on Friday 
+                evenings so, when you move into a new apartment, you wonder about
+                the availability of ride service vehicles to take you across town
+                to the restaurant. The previous tenant claimed that there was an
+                Uber available on Friday evenings within 1 mile of the apartment
+                90% of the time. Knowing that the number of available vehicles
+                within a 1-mile radius should be well-modeled by a Poisson 
+                distribution, this implies that the mean, \\(\\lambda\\), would 
+                be about 2.3 (since \\(e^{-2.3}\\approx 0.1\\) ). You wonder if 
+                the value of \\(\\lambda = 2.3\\) will be compatible with the
+                data you are about to collect on Friday evenings going forward.
+                Use the sliders to explore how your decision about the sample size
+                and the true value of \\(\\lambda\\) will affect the result of
+                an hypothesis test."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### input parts----
+                  sliderInput(
+                    inputId = "clF2",
+                    label = "Confidence level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nF2",
+                    label = "Sample size",
+                    value = 25,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullF2",
+                    label = "Null hypothesis, \\(\\lambda_0\\)",
+                    value = 0.1,
+                    min = 0,
+                    max = 10,
+                    step = 0.1
+                  ),
+                  sliderInput(
+                    inputId = "trueF2",
+                    label = "True value of \\(\\lambda\\)",
+                    value = 0.1,
+                    min = 0,
+                    max = 10,
+                    step = 0.1
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simf2",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
                     )
-                  )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### output----
-                  plotOutput("pvalueFunction2"),
-                  checkboxInput("resultsF2",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsF2==1",
-                    tableOutput("pvalueF2")
                   )
                 )
               ),
-              tabPanel(
-                title = "Normal",
-                value = "norF",
-                ##### Normal context----
-                h3("Scenario"),
-                HTML(paste0("Marine biologists are able to track the movements of 
-                whales in the wild using GPS devices attached by suction cups. Knowing 
-                the location of a whale allows them to measure the size of the whale at 
-                any time using a swarm of drones sent to the location that take multiple 
-                images from different angles giving a three-dimensional model of 
-                the whale’s size. Finally, those volume measurements are converted 
-                to measures of body mass based on estimates for the average density 
-                of different tissue types for the particular species at hand. This 
-                system has been calibrated for accuracy with whales that had beached 
-                themselves where direct measurements were taken and it was found to 
-                be unbiased on the log scale with a standard deviation of about 6% 
-                of the whale’s weight (regardless of life stage or size of the whale). 
-                Researchers now want to test the system in wild whales that are 
-                captured and released back into the wild to see if they are still 
-                unbiased on the log scale. The difference between the log of their 
-                weights and the estimated log weight based on the volume measurements 
-                can be modeled as a normal distribution with an unknown mean \u03BC
-                and a standard deviation of about 0.058 (= ln(1.06)). Use the sliders 
-                to explore how a hypothesis test and confidence interval for \u03BC might 
-                depend on the sample size, the confidence level, and the true value 
-                of \u03BC.")),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### input parts----
-                    sliderInput(
-                      inputId = "clF3",
-                      label = "Confidence level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nF3",
-                      label = "Sample size",
-                      value = 25,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullF3",
-                      label = HTML(paste0("Null hypothesis \u03BC",tags$sub("0"))),
-                      value = 0,
-                      min = -0.5,
-                      max = 0.5,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "trueF3",
-                      label = "True \u03BC",
-                      value = 0,
-                      min = -0.5,
-                      max = 0.5,
-                      step = 0.01
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simf3",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
+              column(
+                width = 8,
+                offset = 0,
+                ###### output----
+                plotOutput("pvalueFunction2"),
+                checkboxInput("resultsF2",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsF2==1",
+                  tableOutput("pvalueF2")
+                )
+              )
+            ),
+            tabPanel(
+              title = "Normal",
+              value = "norF",
+              ##### Normal context----
+              br(),
+              p("Marine biologists are able to track the movements of whales in
+                the wild using GPS devices attached by suction cups. Knowing the
+                location of a whale allows them to measure the size of the whale
+                at any time using a swarm of drones sent to the location that take
+                multiple images from different angles giving a three-dimensional
+                model of the whale’s size. Finally, those volume measurements are
+                converted to measures of body mass based on estimates for the
+                average density of different tissue types for the particular
+                species at hand. This system has been calibrated for accuracy with
+                whales that had beached themselves where direct measurements were
+                taken and it was found to be unbiased on the log scale with a
+                standard deviation of about 6% of the whale’s weight (regardless
+                of life stage or size of the whale). Researchers now want to test
+                the system in wild whales that are captured and released to see 
+                if they are still unbiased on the log scale. The difference 
+                between the log of their weights and the estimated log weight 
+                based on the volume measurements can be modeled as a normal
+                distribution with an unknown mean, \\(\\mu\\) and a standard
+                deviation of about 0.058 (\\(\\ln(1.06)\\)). Use the sliders 
+                to explore how a hypothesis test and confidence interval for
+                \\(\\mu\\) might  depend on the sample size, the confidence level,
+                and the true value of \\(\\mu\\)."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### input parts----
+                  sliderInput(
+                    inputId = "clF3",
+                    label = "Confidence level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nF3",
+                    label = "Sample size",
+                    value = 25,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullF3",
+                    label = "Null hypothesis, \\(\\mu_0\\)",
+                    value = 0,
+                    min = -0.5,
+                    max = 0.5,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "trueF3",
+                    label = "True value of \\(\\mu\\)",
+                    value = 0,
+                    min = -0.5,
+                    max = 0.5,
+                    step = 0.01
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simf3",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
                     )
                   )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### output----
-                  plotOutput("pvalueFunction3"),
-                  checkboxInput("resultsF3",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsF3==1",
-                    tableOutput("pvalueF3")
-                  )
+                )
+              ),
+              column(
+                width = 8,
+                offset = 0,
+                ###### output----
+                plotOutput("pvalueFunction3"),
+                checkboxInput("resultsF3",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsF3==1",
+                  tableOutput("pvalueF3")
                 )
               )
             )
+          ),
+          fluidRow(
+            # This extra fluid row helps to ensure that tabset panel is fully
+            # contained in the page
           )
         ),
         #### Set up Bayesian Inference Page----
@@ -619,334 +618,338 @@ ui <- list(
           tabName = "bayesian",
           withMathJax(),
           h2("Bayesian Hypothesis Testing"),
-          fluidPage(
-            tabsetPanel(
-              id = "scenarioB",
-              type = "tabs",
-              ##### Binomial context----
-              tabPanel(
-                title = "Binomial",
-                value = "bioB",
-                h3("Scenario"),
-                p("A food truck sells hot sandwiches  with a choice of a chicken, 
-                  fish, or vegetable patty. The owner of the truck is thinking 
-                  of moving its location closer to a downtown museum and wonders 
-                  if that might change the chance, p, that a customer will order 
-                  the vegetable patty. To model the uncertainty about the value 
-                  of p at the new location, the owner will use the Beta distribution. 
-                  Since the vegetable patty made up about a quarter of sales at 
-                  the old location, the best prior information would have 
-                  \u03B2 = 3\u03B1 (so the expected value of p would be 0.25 since 
-                  E(p)=\u03B1/(\u03B1+\u03B2)). Knowing that this may be off by 
-                  a good deal, the owner wants to have a standard deviation that 
-                  is also about 0.25. The owner is about to take data at the new 
-                  location.Use the slider to explore how the researcher's decisions 
-                  about the sample size and prior knowledge affect the result."),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### bayes input parts----
-                    tags$strong("Beta prior"),
-                    sliderInput(
-                      inputId = "para1B1",
-                      label = "Mean \u03BC",
-                      value = 0.5,
-                      min = 0,
-                      max = 1,
-                      step = 0.1
-                    ),
-                    sliderInput(
-                      inputId = "para2B1",
-                      label = "SD \u03C3",
-                      value = 0.289,
-                      min = 0,
-                      max = 0.5,
-                      step = 0.001
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "nonpriorB1",
-                        label = "Noninformative Prior",
-                        size = "default",
-                        style = "default"
-                      )
-                    ),
-                    br(),
-                    sliderInput(
-                      inputId = "clB1",
-                      label = "Credible level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nB1",
-                      label = "Sample size",
-                      value = 5,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullB1",
-                      label = HTML(paste0("Model for comparison p",tags$sub("c"))),
-                      value = 0.01,
-                      min = 0,
-                      max = 1,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "trueB1",
-                      label = "True p",
-                      value = 0.01,
-                      min = 0,
-                      max = 1,
-                      step = 0.01
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simb1",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
-                    )
-                  )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### bayes outputs----
-                  plotOutput("credibleB1"),
-                  checkboxInput("resultsB1",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsB1==1",
-                    tableOutput("tableB1")
+          p("The following tabs each present a different scenario where we can 
+            use Bayesian inference methods to learn about the situation presented.
+            Use the sliders to set up a simulation and analyze the results."),
+          br(),
+          tabsetPanel(
+            id = "scenarioB",
+            type = "tabs",
+            ##### Binomial context----
+            tabPanel(
+              title = "Binomial",
+              value = "bioB",
+              br(),
+              p("A food truck sells hot sandwiches  with a choice of a chicken, 
+                fish, or vegetable patty. The owner of the truck is thinking 
+                of moving its location closer to a downtown museum and wonders 
+                if that might change the chance,", tags$em("p"), ", that a customer
+                will order the vegetable patty. To model the uncertainty about 
+                the value of", tags$em("p"), "at the new location, the owner will
+                use the Beta distribution. Since the vegetable patty made up 
+                about a quarter of sales at the old location, the best prior
+                information would have \\(\\beta = 3\\alpha\\) so that the expected
+                value of", tags$em("p"), "would be 0.25 (that is, \\(E(p)=\\alpha/
+                \\left(\\alpha+\\beta\\right)\\)). Knowing that this may be off 
+                by a good deal, the owner wants to have a standard deviation that 
+                is also about 0.25. The owner is about to take data at the new 
+                location.Use the slider to explore how the researcher's decisions 
+                about the sample size and prior knowledge affect the result."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### bayes input parts----
+                  tags$strong("Beta prior"),
+                  sliderInput(
+                    inputId = "para1B1",
+                    label = "Mean, \\(\\mu\\)",
+                    value = 0.5,
+                    min = 0,
+                    max = 1,
+                    step = 0.1
+                  ),
+                  sliderInput(
+                    inputId = "para2B1",
+                    label = "SD, \\(\\sigma\\)",
+                    value = 0.289,
+                    min = 0,
+                    max = 0.5,
+                    step = 0.001
+                  ),
+                  bsButton(
+                    inputId = "nonpriorB1",
+                    label = "Use a noninformative prior",
+                    size = "large",
+                    style = "default"
                   ),
                   br(),
-                  plotlyOutput("bfB1")
-                )
-              ),
-              tabPanel(
-                title = "Poisson",
-                value = "poiB",
-                ##### Poisson context----
-                h3("Scenario"),
-                HTML(paste0("You like to eat at your favorite sushi restaurant on Friday 
-                  evenings so, when you move into a new apartment, you wonder about 
-                  the availability of ride service vehicles to take you across town 
-                  to the restaurant. The previous tenant claimed that there was an 
-                  Uber available on Friday evenings within 1 mile of the apartment 
-                  90% of the time.Knowing that the number of available vehicles 
-                  within a 1-mile radius should be well modeled by a Poisson distribution, 
-                  this implies that the mean \u03BB would be about 2.3 (since e", 
-                  tags$sup(-2.3), " ≈ 0.1). Of course, there is still a great deal 
-                  of uncertainty about the value of \u03BB that you model by 
-                  assuming \u03BB follows a gamma distribution. Before taking any 
-                  data, you need to decide on the parameters of this prior 
-                  distribution and how much data to collect. Use the sliders to 
-                  see how your decisions might affect the posterior distribution 
-                  of \u03BB and how much you might favor one value of \u03BB over 
-                  another.")),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### bayes input parts----
-                    tags$strong("Gamma prior"),
-                    sliderInput(
-                      inputId = "para1B2",
-                      label = "Shape \u03B1",
-                      value = 3,
-                      min = 1,
-                      max = 10,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "para2B2",
-                      label = "Rate \u03BB",
-                      value = 2,
-                      min = 1,
-                      max = 10,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "clB2",
-                      label = "Credible level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nB2",
-                      label = "Sample size",
-                      value = 5,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullB2",
-                      label = HTML(paste0("Model for comparison \u03BB",tags$sub("c"))),
-                      value = 0.1,
-                      min = 0,
-                      max = 10,
-                      step = 0.1
-                    ),
-                    sliderInput(
-                      inputId = "trueB2",
-                      label = "True \u03BB",
-                      value = 0.1,
-                      min = 0,
-                      max = 10,
-                      step = 0.1
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simb2",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
+                  br(),
+                  sliderInput(
+                    inputId = "clB1",
+                    label = "Credible level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nB1",
+                    label = "Sample size",
+                    value = 5,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullB1",
+                    label = "Model for comparison, \\(p_c\\)",
+                    value = 0.01,
+                    min = 0,
+                    max = 1,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "trueB1",
+                    label = "True value of \\(p\\)",
+                    value = 0.01,
+                    min = 0,
+                    max = 1,
+                    step = 0.01
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simb1",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
                     )
                   )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### bayes outputs----
-                  plotOutput("credibleB2"),
-                  checkboxInput("resultsB2",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsB2==1",
-                    tableOutput("tableB2")
-                  ),
-                  br(),
-                  plotlyOutput("bfB2"),
-                  ##I'M HERE
-                  textOutput("test")
                 )
               ),
-              tabPanel(
-                title = "Normal",
-                value = "norB",
-                ##### Normal context----
-                h3("Scenario"),
-                HTML(paste0("Marine biologists are able to track the movements of 
-                whales in the wild using GPS devices attached by suction cups. 
-                Knowing the location of a whale allows them to measure the size 
-                of the whale at any time using a swarm of drones sent to the location 
-                that take multiple images from different angles giving a three-dimensional 
-                model of the whale’s size.  Finally, those volume measurements are 
+              column(
+                width = 8,
+                offset = 0,
+                ###### bayes outputs----
+                plotOutput("credibleB1"),
+                checkboxInput("resultsB1",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsB1==1",
+                  tableOutput("tableB1")
+                ),
+                br(),
+                plotlyOutput("bfB1")
+              )
+            ),
+            tabPanel(
+              title = "Poisson",
+              value = "poiB",
+              ##### Poisson context----
+              br(),
+              p("You like to eat at your favorite sushi restaurant on Friday 
+                evenings so, when you move into a new apartment, you wonder about 
+                the availability of ride service vehicles to take you across town 
+                to the restaurant. The previous tenant claimed that there was an 
+                Uber available on Friday evenings within 1 mile of the apartment 
+                90% of the time. Knowing that the number of available vehicles 
+                within a 1-mile radius should be well modeled by a Poisson distribution, 
+                this implies that the mean, \\(\\lambda\\) would be about 2.3 
+                (since \\(e^{-2.3}\\approx 0.1\\))e. Of course, there is still a
+                great deal of uncertainty about the value of \\(\\lambda\\) that
+                you model by assuming \\(\\lambda\\) follows a Gamma distribution.
+                Before taking any data, you need to decide on the parameters of
+                this prior distribution and how much data to collect. Use the 
+                sliders to see how your decisions might affect the posterior
+                distribution of \\(\\lambda\\) and how much you might favor
+                one value of \\(\\lambda\\) over another."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### bayes input parts----
+                  tags$strong("Gamma prior"),
+                  sliderInput(
+                    inputId = "para1B2",
+                    label = "Shape, \\(\\alpha\\)",
+                    value = 3,
+                    min = 1,
+                    max = 10,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "para2B2",
+                    label = "Rate, \\(\\beta\\)",
+                    value = 2,
+                    min = 1,
+                    max = 10,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "clB2",
+                    label = "Credible level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nB2",
+                    label = "Sample size",
+                    value = 5,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullB2",
+                    label = "Model for comparison, \\(\\lambda_c\\)",
+                    value = 0.1,
+                    min = 0,
+                    max = 10,
+                    step = 0.1
+                  ),
+                  sliderInput(
+                    inputId = "trueB2",
+                    label = "True value for \\(\\lambda\\)",
+                    value = 0.1,
+                    min = 0,
+                    max = 10,
+                    step = 0.1
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simb2",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
+                    )
+                  )
+                )
+              ),
+              column(
+                width = 8,
+                offset = 0,
+                ###### bayes outputs----
+                plotOutput("credibleB2"),
+                checkboxInput("resultsB2",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsB2==1",
+                  tableOutput("tableB2")
+                ),
+                br(),
+                plotlyOutput("bfB2")
+              )
+            ),
+            tabPanel(
+              title = "Normal",
+              value = "norB",
+              ##### Normal context----
+              br(),
+              p("Marine biologists are able to track the movements of whales in 
+                the wild using GPS devices attached by suction cups. Knowing the
+                location of a whale allows them to measure the size of the whale
+                at any time using a swarm of drones sent to the location that take
+                multiple images from different angles giving a three-dimensional 
+                model of the whale’s size.Finally, those volume measurements are 
                 converted to measures of body mass based on estimates for the average 
-                density of different tissue types for the particular species at hand. 
-                This system has been calibrated for accuracy with whales that had 
-                beached themselves where direct measurements were taken and it was 
-                found to be unbiased on the log scale with a standard deviation of 
-                about 6% of the whale’s weight (regardless of life stage or size of 
-                the whale). Researchers now want to test the system in wild whales 
-                that are captured and released back into the wild to see if they 
-                are still unbiased on the log scale. The difference between the 
-                log of their weights and the estimated log weight based on the 
+                density of different tissue types for the particular species at 
+                hand. This system has been calibrated for accuracy with whales 
+                that had beached themselves where direct measurements were taken
+                and it was found to be unbiased on the log scale with a standard
+                deviation of about 6% of the whale’s weight (regardless of life 
+                stage or size of the whale). Researchers now want to test the
+                system in wild whales that are captured and released to see if 
+                they are still unbiased on the log scale. The difference between
+                the log of their weights and the estimated log weight based on the 
                 volume measurements can be modeled as a normal distribution with 
-                an unknown mean \u03BC and a standard deviation of about 0.058 (= ln(1.06)). 
-                Prior to collecting data, the uncertainty in the value of \u03BC is 
-                modeled as a Normal distribution with a mean of \u03C4 and a standard 
-                deviation of \u03C3. Use the sliders to see how your decisions about 
-                the prior distribution of \u03BC might affect its posterior distribution 
-                and how much you might favor one value over another.")),
-                br(),
-                column(
-                  width = 4,
-                  offset = 0,
-                  wellPanel(
-                    ###### bayes input parts----
-                    tags$strong("Normal prior"),
-                    sliderInput(
-                      inputId = "para1B3",
-                      label = "Mean \u03C4",
-                      value = 0,
-                      min = -1,
-                      max = 1,
-                      step = 0.1
-                    ),
-                    sliderInput(
-                      inputId = "para2B3",
-                      label = "SD \u03C3",
-                      value = 0.01,
-                      min = 0,
-                      max = 1,
-                      step = 0.001
-                    ),
-                    sliderInput(
-                      inputId = "clB3",
-                      label = "Credible level 1-\u03B1",
-                      value = 0.95,
-                      min = 0.6,
-                      max = 0.99,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "nB3",
-                      label = "Sample size",
-                      value = 5,
-                      min = 1,
-                      max = 90,
-                      step = 1
-                    ),
-                    sliderInput(
-                      inputId = "nullB3",
-                      label = HTML(paste0("Model for comparison \u03BC",tags$sub("c"))),
-                      value = 0,
-                      min = -0.5,
-                      max = 0.5,
-                      step = 0.01
-                    ),
-                    sliderInput(
-                      inputId = "trueB3",
-                      label = "True \u03BC",
-                      value = 0,
-                      min = -0.5,
-                      max = 0.5,
-                      step = 0.01
-                    ),
-                    div(
-                      style = "text-align: center;",
-                      bsButton(
-                        inputId = "simb3",
-                        label = "Simulate!",
-                        size = "large",
-                        style = "default"
-                      )
+                an unknown mean, \\(\\mu\\), and a standard deviation of about
+                0.058 (\\(\\ln(1.06)\\)). Prior to collecting data, the uncertainty
+                in the value of \\(\\mu\\) is modeled as a Normal distribution 
+                with a mean of \\(\\tau\\) and a standard deviation of \\(\\sigma\\).
+                Use the sliders to see how your decisions about the prior 
+                distribution of \\(\\mu\\) might affect its posterior distribution 
+                and how much you might favor one value over another."),
+              br(),
+              column(
+                width = 4,
+                offset = 0,
+                wellPanel(
+                  ###### bayes input parts----
+                  tags$strong("Normal prior"),
+                  sliderInput(
+                    inputId = "para1B3",
+                    label = "Mean, \\(\\tau\\)",
+                    value = 0,
+                    min = -1,
+                    max = 1,
+                    step = 0.1
+                  ),
+                  sliderInput(
+                    inputId = "para2B3",
+                    label = "SD, \\(\\sigma\\)",
+                    value = 0.01,
+                    min = 0,
+                    max = 1,
+                    step = 0.001
+                  ),
+                  sliderInput(
+                    inputId = "clB3",
+                    label = "Credible level, \\(1-\\alpha\\)",
+                    value = 0.95,
+                    min = 0.6,
+                    max = 0.99,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "nB3",
+                    label = "Sample size",
+                    value = 5,
+                    min = 1,
+                    max = 90,
+                    step = 1
+                  ),
+                  sliderInput(
+                    inputId = "nullB3",
+                    label = "Model for comparison, \\(\\mu_c\\)",
+                    value = 0,
+                    min = -0.5,
+                    max = 0.5,
+                    step = 0.01
+                  ),
+                  sliderInput(
+                    inputId = "trueB3",
+                    label = "True value for \\(\\mu\\)",
+                    value = 0,
+                    min = -0.5,
+                    max = 0.5,
+                    step = 0.01
+                  ),
+                  div(
+                    style = "text-align: center;",
+                    bsButton(
+                      inputId = "simb3",
+                      label = "Simulate!",
+                      size = "large",
+                      style = "default"
                     )
                   )
-                ),
-                column(
-                  width = 8,
-                  offset = 0,
-                  ###### bayes outputs----
-                  plotOutput("credibleB3"),
-                  checkboxInput("resultsB3",
-                                "Results table", FALSE),
-                  conditionalPanel(
-                    condition = "input.resultsB3==1",
-                    tableOutput("tableB3")
-                  ),
-                  br(),
-                  plotlyOutput("bfB3")
                 )
+              ),
+              column(
+                width = 8,
+                offset = 0,
+                ###### bayes outputs----
+                plotOutput("credibleB3"),
+                checkboxInput("resultsB3",
+                              "Results table", FALSE),
+                conditionalPanel(
+                  condition = "input.resultsB3==1",
+                  tableOutput("tableB3")
+                ),
+                br(),
+                plotlyOutput("bfB3")
               )
             )
+          ),
+          fluidRow(
+            # This extra fluid row helps to ensure that tabset panel is fully
+            # contained in the page
           )
         ),
         #### Set up the References Page ----
@@ -954,16 +957,6 @@ ui <- list(
           tabName = "references",
           withMathJax(),
           h2("References"),
-          p(
-            class = "hangingindent",
-            "Auguie, B. (2022). gridExtra: Miscellaneous Functions for 'Grid' Graphics.
-            (v 2.3) [R package]. Available from https://cran.r-project.org/web/packages/gridExtra"
-          ),
-          p(
-            class = "hangingindent",
-            "Attali, D. (2020). shinyjs: Easily Improve the User Experience of Your 
-            Shiny Apps in Seconds. (v 2.1.0) [R package]. Available from https://CRAN.R-project.org/package=shinyjs"
-          ),
           p(
             class = "hangingindent",
             "Bailey, E. (2015). shinyBS: Twitter bootstrap components for shiny.
@@ -1031,6 +1024,7 @@ ui <- list(
 
 # Define server logic ----
 server <- function(input, output, session) {
+  boastUtils::typesetMath(session = session)
   ## Set up Info button ----
   observeEvent(
     eventExpr = input$info,
@@ -1039,7 +1033,8 @@ server <- function(input, output, session) {
         session = session,
         type = "info",
         title = "Information",
-        text = "Use this software to explore hypothesis testing and Bayesian hypothesis testing."
+        text = "Use this software to explore hypothesis testing and Bayesian
+        hypothesis testing."
       )
     }
   )
@@ -1066,8 +1061,7 @@ server <- function(input, output, session) {
       updateSliderInput(
         session = session,
         inputId = "para2E1",
-        label = "SD \u03C3",
-        max = round(sqrt(input$para1E1*(1-input$para1E1)),2)
+        max = round(sqrt(input$para1E1*(1 - input$para1E1)), digits = 2)
       )
     }
   )
@@ -1089,28 +1083,28 @@ server <- function(input, output, session) {
   )
 
   ## n =25, success=16
-  playplots<-reactiveValues(
+  playplots <- reactiveValues(
     pvaluefunction = NULL,
     credible = NULL
   )
-  output$pvaluefunctionE1<-renderPlot({
+  output$pvaluefunctionE1 <- renderPlot({
     validate(
       need(
-        input$clE1!=1,
-        "Confidence Levels must be positive values less than 1"
-        )
+        expr = input$clE1 != 1,
+        message =  "Confidence Levels must be positive values less than 1"
+      )
     )
-    alphaP<-1-input$clE1
+    alphaP <- 1 - input$clE1
     ### calculate pvalue
-    p_value<-binom.exact(
+    pValue <- binom.exact(
       x = 16,
       n = 25,
       p = 0.5,
-      alternative="two.side",
+      alternative = "two.side",
       tsmethod = "central"
     )$p.value
     ### ci
-    ciP<-binom.exact(
+    ciP <- binom.exact(
       x = 16,
       n = 25,
       p = 0.5,
@@ -1120,402 +1114,433 @@ server <- function(input, output, session) {
     )$conf.int
 
     ### get p-value list
-    changeP<-(1-0)/1000
-    thetaP<-0
-    pvaluelistP<-c()
-    thetalistP<-c()
-    genepvaluesP<-function(thetaP){
+    changeP <- (1 - 0)/1000
+    thetaP <- 0
+    pvaluelistP <- c()
+    thetalistP <- c()
+    genepvaluesP <- function(thetaP){
       binom.exact(
         x = 16,
         n = 25,
         p = thetaP,
-        alternative="two.side",
-        tsmethod="central"
+        alternative = "two.side",
+        tsmethod = "central"
       )$p.value
     }
-    while(thetaP<=1){
-      pvaluesP<-genepvaluesP(thetaP)
-      pvaluelistP<-c(pvaluelistP,pvaluesP)
-      thetalistP<-c(thetalistP,thetaP)
-      thetaP<-thetaP+changeP
+    while (thetaP <= 1) {
+      pvaluesP <- genepvaluesP(thetaP)
+      pvaluelistP <- c(pvaluelistP, pvaluesP)
+      thetalistP <- c(thetalistP, thetaP)
+      thetaP <- thetaP + changeP
     }
     
     ### plot
-    data<-as.data.frame(cbind(thetalistP,pvaluelistP))
-    data<-rename(data,theta=thetalistP)
-    data<-rename(data,p_value=pvaluelistP)
-    gP<-
-      ggplot()+
+    data <- as.data.frame(cbind(thetalistP, pvaluelistP))
+    data <- rename(data, theta = thetalistP)
+    data <- rename(data,pValue = pvaluelistP)
+    gP <- ggplot() +
       geom_line(
-        data=data,
-        mapping = aes(x=theta,y=p_value),
+        data = data,
+        mapping = aes(x = theta,y = pValue),
         color = "blue",
-        size = 1,
+        linewidth = 1,
         alpha = 0.5
-      )+
+      ) +
       scale_x_continuous(
         limits = c(0, 1),
-        expand = expansion(mult =0, add = 0),
+        expand = expansion(mult = 0, add = 0),
         breaks = seq.int(from = 0, to = 1, by = 0.2),
         labels = c("0","0.2","0.4","0.6", "0.8", "1")
-      )+
+      ) +
       scale_y_continuous(
         expand = expansion(mult = 0.05),
         breaks = seq.int(from = 0, to = 1, by = 0.2),
         labels = c("0","0.2","0.4","0.6", "0.8", "1")
-      )+
+      ) +
       labs(
         title = "P-value Function",
         x = "Null hypothesis proportion p", 
         y = "P-value",
         alt = "A plot of a set of p values versus different proportions "
-      )+
+      ) +
       geom_segment(
-        aes(x=ciP[1],y=0,xend=ciP[2],yend=0,colour = "Confidence interval"),
-        size = 1 
-      )+
+        mapping = aes(
+          x = ciP[1],
+          xend = ciP[2],
+          y = 0,
+          yend = 0,
+          colour = "Confidence interval"
+        ),
+        linewidth = 1,
+        na.rm = TRUE
+      ) +
       geom_point(
-        mapping=aes(x=c(ciP[1],ciP[2]),y=c(0,0)),
-        alpha=0
-      )+
+        mapping = aes(x = c(ciP[1], ciP[2]), y = c(0,0)),
+        alpha = 0
+      ) +
       geom_errorbarh(
-        aes(xmin=ciP[1],xmax=ciP[2],y=0,colour = "Confidence interval"),
-        height=0.05*1,
-        size=1
-      )+
+        mapping = aes(
+          xmin = ciP[1],
+          xmax = ciP[2],
+          y = 0,
+          colour = "Confidence interval"
+        ),
+        height = 0.05*1,
+        linewidth = 1
+      ) +
       geom_segment(
-        aes(x = 0, y = 1, xend = 16/25, yend = 1, colour = "Observed estimate")
-      )+
+        mapping = aes(
+          x = 0,
+          xend = 16/25,
+          y = 1,
+          yend = 1,
+          colour = "Observed estimate"
+        ),
+        na.rm = TRUE
+      ) +
       geom_segment(
-        aes(x = 16/25, y = 0, xend = 16/25, yend = 1, colour = "Observed estimate")
-      )+
+        mapping = aes(
+          x = 16/25,
+          xend = 16/25,
+          y = 0,
+          yend = 1,
+          colour = "Observed estimate"
+        ),
+        na.rm = TRUE
+      ) +
       geom_segment(
-        aes(x = 0, y = p_value, xend = 0.5, yend = p_value, colour = "Null value")
-      )+
+        mapping = aes(
+          x = 0,
+          xend = 0.5,
+          y = pValue,
+          yend = pValue,
+          colour = "Null value"
+        ),
+        na.rm = TRUE
+      ) +
       geom_segment(
-        aes(x = 0.5, y = 0, xend = 0.5, yend = p_value, colour = "Null value")
-      )+
+        mapping = aes(
+          x = 0.5,
+          xend = 0.5,
+          y = 0,  
+          yend = pValue,
+          colour = "Null value"
+        ),
+        na.rm = TRUE
+      ) +
       scale_color_manual(
         name = NULL,
         values = c(
           "Confidence interval" = psuPalette[1],
-          "Observed estimate" =psuPalette[4],
+          "Observed estimate" = psuPalette[4],
           "Null value" = "black"
         )
-      )+
-      theme_bw()+
+      ) +
+      theme_bw() +
       theme(
         plot.caption = element_text(size = 18),
         text = element_text(size = 18),
         axis.title = element_text(size = 16),
         legend.position = "bottom",
-        plot.margin = margin(
-          t=0,
-          b=0,
-          r=1,
-          l=1,
-          unit = "cm"
-        )
+        plot.margin = margin(t = 0, b = 0, r = 1, l = 1, unit = "cm")
       )
-    playplots$pvaluefunction<-gP
+    
+    playplots$pvaluefunction <- gP
+    
     return(gP)
   })
-  output$httableE1<-renderTable({
-    validate(
-      need(
-        input$clE1!=1,
-        ""
+  
+  output$httableE1 <- renderTable(
+    expr = {
+      validate(
+        need(expr = input$clE1 != 1, message = "")
       )
-    )
-    p_value<-binom.exact(
-      x = 16,
-      n = 25,
-      p = 0.5,
-      alternative="two.side",
-      tsmethod = "central"
-    )$p.value
-    ciP<-binom.exact(
-      x = 16,
-      n = 25,
-      p = 0.5,
-      alternative = "two.side",
-      tsmethod = "central",
-      conf.level = input$clE1
-    )$conf.int
-    ctable<-matrix(c(round(p_value,3),round(ciP[1],3),round(ciP[2],3)),nrow=1)
-    c2<-paste("Confidence interval"," lower bound",sep = "<br>")
-    c3<-paste("Confidence interval"," upper bound",sep = "<br>")
-    colnames(ctable)<-c("p-value",c2,c3)
-    ctable
-  },bordered = TRUE,sanitize.text.function=identity)
+      pValue <- binom.exact(
+        x = 16,
+        n = 25,
+        p = 0.5,
+        alternative = "two.side",
+        tsmethod = "central"
+      )$p.value
+      ciP <- binom.exact(
+        x = 16,
+        n = 25,
+        p = 0.5,
+        alternative = "two.side",
+        tsmethod = "central",
+        conf.level = input$clE1
+      )$conf.int
+      ctable <- matrix(
+        data = c(round(pValue, 3), round(ciP[1], 3), round(ciP[2], 3)),
+        nrow = 1
+      )
+      c2 <- paste("Confidence interval", " lower bound", sep = "<br>")
+      c3 <- paste("Confidence interval", " upper bound", sep = "<br>")
+      colnames(ctable) <- c("p-value", c2, c3)
+      ctable
+    },
+    bordered = TRUE,
+    sanitize.text.function = identity
+  )
   
   ### Bayes----
-  s1E<-reactive(((1-input$para1E1)/input$para2E1^2-1/input$para1E1)*input$para1E1^2)
-  s2E<-reactive((((1-input$para1E1)/input$para2E1^2-1/input$para1E1)*input$para1E1^2)*(1/input$para1E1-1))
+  s1E <- reactive(((1 - input$para1E1)/input$para2E1^2 - 1/input$para1E1)*input$para1E1^2)
+  s2E <- reactive((((1 - input$para1E1)/input$para2E1^2 - 1/input$para1E1)*input$para1E1^2)*(1/input$para1E1 - 1))
   
-  output$credibleE1<-renderPlot({
+  output$credibleE1 <- renderPlot({
     validate(
       need(
-        input$creE1!=1,
-        "Credible Levels must be positive values less than 1"
+        expr = input$creE1 != 1,
+        message = "Credible Levels must be positive values less than 1"
       ),
       need(
-        input$para1E1>0 && input$para1E1<1,
-        "Provide a valid prior"
+        expr = input$para1E1 > 0 && input$para1E1 < 1,
+        message = "Provide a valid prior"
       ),
       need(
-        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
-        "Provide a valid prior"
+        expr  = input$para2E1 > 0 &&
+          input$para2E1 < sqrt(input$para1E1*(1 - input$para1E1)),
+        message = "Provide a valid prior"
       )
     )
     ###prior
-    prange<-seq(0,1,length=1000)
+    pRange <- seq(0, 1, length = 1000)
     # density
-    priory<-dbeta(
-      x=prange, 
-      shape1 = s1E(), 
-      shape2 = s2E()
-    )
-    x<-prange
-    priordata<-as.data.frame(cbind(x,priory))
+    priory <- dbeta(x = pRange, shape1 = s1E(), shape2 = s2E())
+    priordata <- data.frame("x" = pRange, "priory" = priory)
     ###posterior
-    posteriory<-dbeta(
-      x=prange, 
-      shape1 = s1E() + 16,
-      shape2 = s2E() + 9
-    )
-    posteriordata<-as.data.frame(cbind(x,posteriory))
+    posteriory <- dbeta(x = pRange, shape1 = s1E() + 16, shape2 = s2E() + 9)
+    posteriordata <- data.frame("x" = pRange, "posteriory" = posteriory)
     ### Credible region
-    alphaB<-1-input$creE1
-    ci<-qbeta(
-      c(alphaB/2,1-alphaB/2),
-      shape1 =s1E() + 16,
-      shape2 =s2E() + 9)
-    mllE1<-posteriordata[which.max(posteriordata$posteriory),]
-    mle<-
-      if(input$para1E1==1/2 && input$para2E1==0.289){
-          geom_segment(
-            aes(
-              x=mllE1$x,
-              y=0,
-              xend=mllE1$x,
-              yend=mllE1$posteriory,
-              colour = "Max Log-Likelihood",
-              linetype = "Max Log-Likelihood"
-              ),
-            size = 1
-          )
+    alphaB <- 1 - input$creE1
+    ci <- qbeta(c(alphaB/2, 1 - alphaB/2), shape1 = s1E() + 16, shape2 = s2E() + 9)
+    mllE1 <- posteriordata[which.max(posteriordata$posteriory), ]
+    mle <- if (input$para1E1 == 1/2 && input$para2E1 == 0.289) {
+      geom_segment(
+        aes(
+          x = mllE1$x,
+          xend = mllE1$x,
+          y = 0,
+          yend = mllE1$posteriory,
+          colour = "Max Log-Likelihood",
+          linetype = "Max Log-Likelihood"
+        ),
+        linewidth = 1,
+        na.rm = TRUE
+      )
     }
     ### combined plot
-    combined1<-
-      ggplot()+
+    combined1 <- ggplot() +
       geom_line(
-        data=priordata,
-        mapping = aes(x=x,y=priory,colour = "Prior",linetype = "Prior")
-      )+
+        data = priordata,
+        mapping = aes(x = x, y = priory, colour = "Prior", linetype = "Prior")
+      ) +
       geom_line(
-        data=posteriordata,
-        mapping = aes(x=x,y=posteriory,colour = "Posterior", linetype ="Posterior")
+        data = posteriordata,
+        mapping = aes(x = x, y = posteriory, colour = "Posterior", linetype = "Posterior")
       )
-    combined<-
-      combined1+
-      geom_segment(
-        aes(x=ci[1],y=0,xend=ci[2],yend=0,colour = "Credible region", linetype = "Credible region"),
-        size = 1
-      )+
-      geom_point(
-        mapping=aes(x=c(ci[1],ci[2]),y=c(0,0)),
-        alpha=0
-      )+
-      geom_errorbarh(
-        aes(xmin=ci[1],xmax=ci[2],y=0,colour = "Credible region", linetype = "Credible region"),
-        height=0.05*layer_scales(combined1)$y$get_limits()[2],
-        size=1
-      )+
-      mle+
-      labs(
-        title = "Prior and Posterior",
-        x = "Proportion p", 
-        y = "Density",
-        alt = "The plot combined the prior distribution and the posterior plot"
-      )+
-      scale_x_continuous(
-        limits = c(0, 1),
-        expand = expansion(mult =0, add = 0),
-        breaks = seq.int(from = 0, to = 1, by = 0.2),
-        labels = c("0","0.2","0.4","0.6", "0.8", "1")
-      )+
-      scale_y_continuous(expand = expansion(mult = .05))+
-      scale_color_manual(
-        name = NULL,
-        values = c(
-          "Credible region" = psuPalette[1],
-          "Prior" = psuPalette[3],
-          "Posterior" = psuPalette[2],
-          "Max Log-Likelihood" = "blue"
-        )
-      )+
-      scale_linetype_manual(
-        name = NULL,
-        values = c(
-          "Credible region" = "solid",
-          "Prior" = "solid",
-          "Posterior" = "solid",
-          "Max Log-Likelihood" = "dashed"
-        )
-      )+
-      theme_bw()+
-      theme(
-        plot.caption = element_text(size = 18),
-        text = element_text(size = 18),
-        axis.title = element_text(size = 16),
-        legend.position = "bottom",
-        plot.margin = margin(
-          t=0,
-          b=0,
-          r=1,
-          l=1.5,
-          unit = "cm"
-        )
+    combined <- combined1 +
+    geom_segment(
+      mapping = aes(
+        x = ci[1],
+        xend = ci[2],
+        y = 0,
+        yend = 0,
+        colour = "Credible region",
+        linetype = "Credible region"
+      ),
+      linewidth = 1,
+      na.rm = TRUE
+    ) +
+    geom_point(
+      mapping = aes(x = c(ci[1], ci[2]), y = c(0, 0)),
+      alpha = 0
+    ) +
+    geom_errorbarh(
+      mapping = aes(
+        xmin = ci[1],
+        xmax = ci[2],
+        y = 0,
+        colour = "Credible region",
+        linetype = "Credible region"
+      ),
+      height = 0.05*layer_scales(combined1)$y$get_limits()[2],
+      linewidth = 2
+    ) +
+    mle +
+    labs(
+      title = "Prior and Posterior",
+      x = "Proportion p",
+      y = "Density",
+      alt = "The plot combined the prior distribution and the posterior plot"
+    ) +
+    scale_x_continuous(
+      limits = c(0, 1),
+      expand = expansion(mult = 0, add = 0),
+      breaks = seq.int(from = 0, to = 1, by = 0.2),
+      labels = c("0","0.2","0.4","0.6", "0.8", "1")
+    ) +
+    scale_y_continuous(expand = expansion(mult = .05)) +
+    scale_color_manual(
+      name = NULL,
+      values = c(
+        "Credible region" = psuPalette[1],
+        "Prior" = psuPalette[3],
+        "Posterior" = psuPalette[2],
+        "Max Log-Likelihood" = "blue"
       )
-    playplots$credible<-combined
+    ) +
+    scale_linetype_manual(
+      name = NULL,
+      values = c(
+        "Credible region" = "solid",
+        "Prior" = "solid",
+        "Posterior" = "solid",
+        "Max Log-Likelihood" = "dashed"
+      )
+    ) +
+    theme_bw() +
+    theme(
+      plot.caption = element_text(size = 18),
+      text = element_text(size = 18),
+      axis.title = element_text(size = 16),
+      legend.position = "bottom",
+      plot.margin = margin(t = 0, b = 0, r = 1, l = 1.5, unit = "cm")
+    )
+    playplots$credible <- combined
     return(combined)
   })
-  output$bfE1<-renderPlotly({
+  
+  output$bfE1 <- renderPlotly({
     validate(
       need(
-      input$creE1!=1,
-      "Credible Levels must be positive values less than 1"
+        expr = input$creE1 != 1,
+        message = "Credible Levels must be positive values less than 1"
       ),
       need(
-        input$para1E1>0 && input$para1E1<1,
-        "Provide a valid prior"
+        expr = input$para1E1 > 0 && input$para1E1 < 1,
+        message = "Provide a valid prior"
       ),
       need(
-        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
-        "Provide a valid prior"
+        expr = input$para2E1 > 0 &&
+          input$para2E1 < sqrt(input$para1E1*(1 - input$para1E1)),
+        message = "Provide a valid prior"
       )
     )
-    
-    prange<-seq(0,1,length=1000)
-    likelihoody<-dbinom(
-      x = 16,
-      size= 25,
-      p=prange
-    )
-    x<-prange
-    # denominator 
-    denominator<-dbinom(
-      x = 16,
-      size= 25,
-      p=0.5
-    )
+
+    pRange <- seq(0, 1, length = 1000)
+    likelihoody <- dbinom(x = 16, size = 25, prob = pRange)
+    # denominator
+    denominator <- dbinom(x = 16, size = 25, prob = 0.5)
     # log(10)
-    bf<-log10(likelihoody/denominator)
-    bfdata<-as.data.frame(cbind(x,bf))
+    bf <- log10(likelihoody/denominator)
+    bfdata <- data.frame(x = pRange, bf = bf)
     # label symbol
-    pc<-expression(p[c]~v)
+    pc <- expression(p[c]~v)
     # max ll
-    maxll<-bfdata[which.max(bfdata$bf),]
+    maxll <- bfdata[which.max(bfdata$bf), ]
     # return finite min
-    minbf<-min(ifelse(is.infinite(bfdata$bf),NA,bfdata$bf),na.rm = TRUE)
-    g<-plot_ly(
+    minbf <- min(ifelse(is.infinite(bfdata$bf), NA, bfdata$bf), na.rm = TRUE)
+    g <- plot_ly(
       data = bfdata,
-      x=~x,
-      y=~bf,
+      x = ~x,
+      y = ~bf,
       type = "scatter",
-      mode="lines",
+      mode = "lines",
       opacity = 0.4,
       line = list(
-        width=3,
-        dash="solid",
+        width = 3,
+        dash = "solid",
         color = "blue"
       ),
-      text=paste("p:",round(bfdata$x,3),
-                 "<br>Log(BF):",round(bfdata$bf,3)),
-      showlegend=F,
-      hoverinfo="text"
-    )%>%
+      text = paste("p:", round(bfdata$x,3), "<br>Log(BF):", round(bfdata$bf, 3)),
+      showlegend = F,
+      hoverinfo = "text"
+    ) %>%
       add_trace(
-        x=c(seq(0,0.5,len=1000),rep(0.5,1000)),
-        y=c(rep(0,1000),seq(0,minbf,len=1000)),
-        mode="lines",
-        hoverinfo="text",
+        x = c(seq(0, 0.5, len = 1000), rep(0.5, 1000)),
+        y = c(rep(0, 1000), seq(0, minbf, len = 1000)),
+        mode = "lines",
+        hoverinfo = "text",
         name = "p<sub>c</sub> vs. p<sub>c</sub>",
         opacity = 1,
-        showlegend=T,
-        text=paste("p:",0.5,"<br>Log(BF):",0),
+        showlegend = T,
+        text = paste("p:", 0.5, "<br>Log(BF):", 0),
         line = list(
-          width=1,
-          dash="dot",
-          color = psuPalette[4])
-        )%>%
+          width = 1,
+          dash = "dot",
+          color = psuPalette[4]
+        )
+      ) %>%
       add_trace(
-        x=c(seq(0,maxll$x,len=1000),rep(maxll$x,1000)),
-        y=c(rep(maxll$bf,1000),seq(minbf,maxll$bf,len=1000)),
+        x = c(seq(0, maxll$x, len = 1000), rep(maxll$x, 1000)),
+        y = c(rep(maxll$bf, 1000), seq(minbf, maxll$bf, len = 1000)),
         mode = "lines",
-        hoverinfo="text",
+        hoverinfo = "text",
         name = "Max Log-Likelihood",
         opacity = 1,
-        showlegend=T,
-        text=paste("p:",round(maxll$x,3),"<br>Log(BF):",round(maxll$bf,3)),
+        showlegend = T,
+        text = paste("p:", round(maxll$x, 3), "<br>Log(BF):", round(maxll$bf, 3)),
         line = list(
-          width=1,
-          dash="dash",
-          color = "blue")
-        )%>%
-      config(displaylogo=FALSE)%>%
+          width = 1,
+          dash = "dash",
+          color = "blue"
+        )
+      ) %>%
       config(
-        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d","pan2d",
-        "autoScale2d","hoverCompareCartesian","hoverClosestCartesian","toImage"))%>%
+        displaylogo = FALSE,
+        modeBarButtonsToRemove = c("zoomIn2d", "zoomOut2d", "pan2d", "autoScale2d",
+                                   "hoverCompareCartesian", "hoverClosestCartesian",
+                                   "toImage")
+      ) %>%
       layout(
-        title=list(text="Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",
-                   font=list(size=18),xanchor="right"),
-        xaxis=list(title="Proportion p",titlefont=list(size=16)),
-        yaxis=list(title="Log Bayes Factor",titlefont=list(size=16)),
-        showlegend=T,
-        legend = list(orientation = "h",xanchor = "center",x = 0.5,y=-0.3))
+        title = list(
+          text = "Log<sub>10</sub> Bayes Factor Compared to p<sub>c</sub>",
+          font = list(size = 18),
+          xanchor = "right"
+        ),
+        xaxis = list(title = "Proportion p", titlefont = list(size = 16)),
+        yaxis = list(title = "Log Bayes Factor", titlefont = list(size = 16)),
+        showlegend = T,
+        legend = list(orientation = "h", xanchor = "center", x = 0.5, y = -0.3))
     return(g)
   })
-  output$bftableE1<-renderTable({
-    validate(
-      need(
-        input$creE1!=1,
-        ""
-      ),
-      need(
-        input$para1E1>0 && input$para1E1<1,
-        ""
-      ),
-      need(
-        input$para2E1>0 && input$para2E1<sqrt(input$para1E1*(1-input$para1E1)),
-        ""
+  
+  output$bftableE1 <- renderTable(
+    expr = {
+      validate(
+        need(expr = input$creE1 != 1, message = ""),
+        need(expr = input$para1E1 > 0 && input$para1E1 < 1, message = ""),
+        need(
+          expr = input$para2E1 > 0 &&
+            input$para2E1 < sqrt(input$para1E1*(1 - input$para1E1)),
+          message = ""
+        )
       )
-    )
-    # ci
-    alphaB<-1-input$creE1
-    ci<-qbeta(
-      c(alphaB/2,1-alphaB/2),
-      shape1 =s1E() + 16,
-      shape2 =s2E() + 9)
-    c1<-paste("Credible region"," lower bound",sep = "<br>")
-    c2<-paste("Credible region"," upper bound",sep = "<br>")
-    ctable<-matrix(c(round(ci[1],3),round(ci[2],3)),nrow=1)
-    colnames(ctable)<-c(c1,c2)
-    ctable
-  },bordered = TRUE,sanitize.text.function=identity)
+      # ci
+      alphaB <- 1 - input$creE1
+      ci <- qbeta(c(alphaB/2, 1 - alphaB/2), shape1 = s1E() + 16, shape2 = s2E() + 9)
+      c1 <- paste("Credible region", " lower bound", sep = "<br>")
+      c2 <- paste("Credible region", " upper bound", sep = "<br>")
+      ctable <- matrix(c(round(ci[1], 3), round(ci[2], 3)), nrow = 1)
+      colnames(ctable) <- c(c1, c2)
+      ctable
+    },
+    bordered = TRUE,
+    sanitize.text.function = identity
+  )
   
-  output$plotsgroup1E1<-renderPlot({
-    gridExtra::grid.arrange(playplots$credible,ncol=1)
+  output$plotsgroup1E1 <- renderPlot({
+    playplots$credible
   })
   
-  output$plotsgroup2E1<-renderPlot({
-    gridExtra::grid.arrange(playplots$pvaluefunction,ncol=1)
+  output$plotsgroup2E1 <- renderPlot({
+    playplots$pvaluefunction
   })
   
-  # HT & BI Page----
-  ## Binomial ----
-  ### Update button----
+  ## HT & BI Pages----
+  ### Binomial Situation ----
+  #### Update buttons and sliders ----
   observeEvent(
     eventExpr = input$simf1,
     handlerExpr = {
@@ -1549,8 +1574,7 @@ server <- function(input, output, session) {
       updateSliderInput(
         session = session,
         inputId = "para2B1",
-        label = "SD \u03C3",
-        max = round(sqrt(input$para1B1*(1-input$para1B1)),2)
+        max = round(sqrt(input$para1B1*(1 - input$para1B1)), 2)
         )
     }
   )
@@ -1570,104 +1594,115 @@ server <- function(input, output, session) {
     }
   )
   
-  ### Update inputs----
+  ### Update inputs---
   ### Frequentist side
-  trueF1<-eventReactive({
-    input$simf1
-  },
-  valueExpr = {
-    input$trueF1
-  }
+  
+  # NO!!!!!!!
+  # trueF1 <- eventReactive(
+  #   eventExpr = input$simf1,
+  #   valueExpr = {
+  #     input$trueF1
+  #   }
+  # )
+  # 
+  # nullF1<-eventReactive({
+  #   input$simf1
+  # },
+  # valueExpr = {
+  #   input$nullF1
+  # }
+  # )
+  # 
+  # nF1<-eventReactive({
+  #   input$simf1
+  # },
+  # valueExpr = {
+  #   input$nF1
+  # }
+  # )
+  # 
+  # clF1<-eventReactive({
+  #   input$simf1
+  # },
+  # valueExpr = {
+  #   input$clF1
+  # }
+  # )
+  # ### Bayes side
+  # trueB1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   input$trueB1
+  # }
+  # )
+  # ## mu -> shape1
+  # para1B1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   ((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2
+  # }
+  # )
+  # ## sd ->shape2
+  # para2B1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   (((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2)*(1/input$para1B1-1)
+  # }
+  # )
+  # 
+  # clB1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   input$clB1
+  # }
+  # )
+  # 
+  # nB1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   input$nB1
+  # }
+  # )
+  # 
+  # nullB1<-eventReactive({
+  #   input$simb1
+  # },
+  # valueExpr = {
+  #   input$nullB1
+  # }
+  # )
+  
+  #### Outputs----
+  ##### Frequentist Side----
+  freqBinCheck <- reactiveVal(0)
+  simDataBF <- reactiveVal(NULL)
+  
+  observeEvent(
+    eventExpr = c(input$clF1, input$nF1, input$nullF1, input$trueF1),
+    handlerExpr = {freqBinCheck(0)}
   )
   
-  nullF1<-eventReactive({
-    input$simf1
-  },
-  valueExpr = {
-    input$nullF1
-  }
-  )
-  
-  nF1<-eventReactive({
-    input$simf1
-  },
-  valueExpr = {
-    input$nF1
-  }
-  )
-  
-  clF1<-eventReactive({
-    input$simf1
-  },
-  valueExpr = {
-    input$clF1
-  }
-  )
-  ### Bayes side
-  trueB1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    input$trueB1
-  }
-  )
-  ## mu -> shape1
-  para1B1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    ((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2
-  }
-  )
-  ## sd ->shape2
-  para2B1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    (((1-input$para1B1)/input$para2B1^2-1/input$para1B1)*input$para1B1^2)*(1/input$para1B1-1)
-  }
-  )
-  
-  clB1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    input$clB1
-  }
-  )
-  
-  nB1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    input$nB1
-  }
-  )
-  
-  nullB1<-eventReactive({
-    input$simb1
-  },
-  valueExpr = {
-    input$nullB1
-  }
-  )
-  
-  ###Outputs----
-  #### Frequentist Side----
-  # sample
-  simulationF1<-eventReactive(
+  observeEvent(
     eventExpr = input$simf1,
-    valueExpr = {
-      sample(c(0,1),size=nF1(),prob=c(1-trueF1(),trueF1()),replace = TRUE)
+    handlerExpr = {
+      simDataBF(sample(
+        x = c(0, 1),
+        size = input$nF1,
+        prob = c(1 - input$trueF1, input$trueF1),
+        replace = TRUE
+      ))
+      freqBinCheck(1)
     }
   )
   
-  output$pvalueFunction1<-renderPlot({
+  ###### Make Bin. Plot ----
+  output$pvalueFunction1 <- renderPlot({
     validate(
-      need(
-        expr = input$simf1,
-        message = "Set parameters and press the Simulate button."
-      ),
       need(
         expr = input$nullF1 != 0 && input$nullF1 != 1,
         message = "Provide a null hypothesis p between (0,1)"
@@ -1677,130 +1712,171 @@ server <- function(input, output, session) {
         message = "Provide a true p between (0,1)"
       ),
       need(
-        input$clF1!=1,
-        "Confidence Levels must be positive values less than 1"
-      )
+        expr = input$simf1 >= 1 & freqBinCheck() == 1,
+        message = "Click the Simulate button to generate new data"
+      ),
     )
-    validate(
-      need(
-        expr = input$nF1 == nF1() && input$trueF1 == trueF1() && input$nullF1 == nullF1(),
-        message = "Use the simulation button to generate new data"
-      )
-    )
-    alphaP<-1-input$clF1
+
+    alphaP <- 1 - input$clF1
     ### calculate pvalue
-    p_value<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = nullF1(),
-      alternative="two.side",
+    pValue <- binom.exact(
+      x = sum(simDataBF()),
+      n = input$nF1,
+      p = input$nullF1,
+      alternative = "two.side",
       tsmethod = "central"
     )$p.value
     ### calculate true value's pvalue
-    truePvalue<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = trueF1(),
-      alternative="two.side",
+    truePvalue <- binom.exact(
+      x = sum(simDataBF()),
+      n = input$nF1,
+      p = input$trueF1,
+      alternative = "two.side",
       tsmethod = "central"
     )$p.value
     ### ci
-    ciP<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = nullF1(),
+    ciP <- binom.exact(
+      x = sum(simDataBF()),
+      n = input$nF1,
+      p = input$nullF1,
       alternative = "two.side",
       tsmethod = "central",
       conf.level = input$clF1
     )$conf.int
     ### set xlim
-    cimaxP<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = nullF1(),
-      alternative="two.side",
+    cimaxP <- binom.exact(
+      x = sum(simDataBF()),
+      n = input$nF1,
+      p = input$nullF1,
+      alternative = "two.side",
       tsmethod = "central",
       conf.level = 0.999
     )$conf.int
     
-    xlimP<-c(max(0,cimaxP[1]),cimaxP[2])
+    xlimP <- c(max(0, cimaxP[1]), cimaxP[2])
     
     ### get p-value list
-    changeP<-(xlimP[2]-xlimP[1])/1500
-    thetaP<-xlimP[1]
-    pvaluelistP<-c()
-    thetalistP<-c()
-    genepvaluesP<-function(thetaP){
+    changeP <- (xlimP[2] - xlimP[1])/1500
+    thetaP <- xlimP[1]
+    pvaluelistP <- c()
+    thetalistP <- c()
+    genepvaluesP <- function(thetaP){
       binom.exact(
-        x = sum(simulationF1()),
-        n = nF1(),
+        x = sum(simDataBF()),
+        n = input$nF1,
         p = thetaP,
-        alternative="two.side",
-        tsmethod="central"
+        alternative = "two.side",
+        tsmethod = "central"
       )$p.value
     }
-    while(thetaP<=xlimP[2]){
-      pvaluesP<-genepvaluesP(thetaP)
-      pvaluelistP<-c(pvaluelistP,pvaluesP)
-      thetalistP<-c(thetalistP,thetaP)
-      thetaP<-thetaP+changeP
+    while (thetaP <= xlimP[2]) {
+      pvaluesP <- genepvaluesP(thetaP)
+      pvaluelistP <- c(pvaluelistP, pvaluesP)
+      thetalistP <- c(thetalistP, thetaP)
+      thetaP <- thetaP + changeP
     }
     
     ### plot
-    data<-as.data.frame(cbind(thetalistP,pvaluelistP))
-    data<-rename(data,theta=thetalistP)
-    data<-rename(data,p_value=pvaluelistP)
-    gP<-
-      ggplot()+
+    data <- as.data.frame(cbind(thetalistP, pvaluelistP))
+    data <- rename(data, theta = thetalistP)
+    data <- rename(data, pValue = pvaluelistP)
+    gP <- ggplot() +
       geom_line(
-        data=data,
-        mapping = aes(x=theta,y=p_value),
+        data = data,
+        mapping = aes(x = theta, y = pValue),
         color = "blue",
-        size = 1,
+        linewidth = 1,
         alpha = 0.5
-      )+
+      ) +
       scale_x_continuous(
         limits = xlimP,
-        expand = expansion(mult =0, add = 0)
-      )+
-      scale_y_continuous(expand = expansion(mult = .05))+
+        expand = expansion(mult = 0, add = 0)
+      ) +
+      scale_y_continuous(expand = expansion(mult = .05)) +
       labs(
         title = "P-value Function",
         x = "Null hypothesis proportion p", 
         y = "P-value",
         alt = "A plot of a set of p values versus different proportions "
-      )+
+      ) +
       geom_segment(
-        aes(x=ciP[1],y=0,xend=ciP[2],yend=0,colour = "Confidence interval"),
-        size = 1
-      )+
+        mapping = aes(
+          x = ciP[1],
+          xend = ciP[2],
+          y = 0,
+          yend = 0,
+          color = "Confidence interval"
+        ),
+        linewidth = 1
+      ) +
       geom_point(
-        mapping=aes(x=c(ciP[1],ciP[2]),y=c(0,0)),
-        alpha=0
-      )+
+        mapping = aes(x = c(ciP[1], ciP[2]), y = c(0, 0)),
+        alpha = 0
+      ) +
       geom_errorbarh(
-        aes(xmin=ciP[1],xmax=ciP[2],y=0,colour = "Confidence interval"),
-        height=0.05*1,
-        size=1
-      )+
+        mapping = aes(
+          xmin = ciP[1],
+          xmax = ciP[2],
+          y = 0,
+          color = "Confidence interval"
+        ),
+        height = 0.05*1,
+        linewidth = 1
+      ) +
       geom_segment(
-        aes(x = xlimP[1], y = 1, xend = mean(simulationF1()), yend = 1, colour = "Observed estimate")
-      )+
+        mapping = aes(
+          x = xlimP[1],
+          xend = mean(simDataBF()),
+          y = 1,
+          yend = 1,
+          color = "Observed estimate"
+        )
+      ) +
       geom_segment(
-        aes(x = mean(simulationF1()), y = 0, xend = mean(simulationF1()), yend = 1, colour = "Observed estimate")
-      )+
+        mapping = aes(
+          x = mean(simDataBF()),
+          xend = mean(simDataBF()),
+          y = 0,
+          yend = 1,
+          color = "Observed estimate"
+        )
+      ) +
       geom_segment(
-        aes(x = xlimP[1], y = p_value, xend = nullF1(), yend = p_value, colour = "Null value")
-      )+
+        mapping = aes(
+          x = xlimP[1],
+          xend = input$nullF1,
+          y = pValue,
+          yend = pValue,
+          color = "Null value"
+        )
+      ) +
       geom_segment(
-        aes(x = nullF1(), y = 0, xend = nullF1(), yend = p_value, colour = "Null value")
-      )+
+        mapping = aes(
+          x = input$nullF1,
+          xend = input$nullF1,
+          y = 0,
+          yend = pValue,
+          color = "Null value"
+        )
+      ) +
       geom_segment(
-        aes(x = xlimP[1], y = truePvalue, xend = trueF1(), yend = truePvalue, colour = "True value")
-      )+
+        mapping = aes(
+          x = xlimP[1],
+          xend = input$trueF1,
+          y = truePvalue,
+          yend = truePvalue,
+          color = "True value"
+        )
+      ) +
       geom_segment(
-        aes(x = trueF1(), y = 0, xend = trueF1(), yend = truePvalue, colour = "True value")
-      )+
+        mapping = aes(
+          x = input$trueF1,
+          xend = input$trueF1,
+          y = 0,
+          yend = truePvalue,
+          color = "True value"
+        )
+      ) +
       scale_color_manual(
         name = NULL,
         values = c(
@@ -1809,8 +1885,8 @@ server <- function(input, output, session) {
           "Null value" = "black",
           "True value" = boastPalette[3]
         )
-      )+
-      theme_bw()+
+      ) +
+      theme_bw() +
       theme(
         plot.caption = element_text(size = 18),
         text = element_text(size = 18),
@@ -1820,47 +1896,45 @@ server <- function(input, output, session) {
     
     return(gP)
   })
-  ##table
-  output$pvalueF1<-renderTable({
-    validate(
-      need(
-        expr = input$nF1 == nF1() && input$trueF1 == trueF1() && input$nullF1 == nullF1(),
-        message = ""
-      ),
-      need(
-        expr = input$nullF1 != 0 && input$nullF1 != 1,
-        message = ""
-      ),
-      need(
-        expr = input$trueF1 != 0 && input$trueF1 != 1, 
-        message = ""
-      ),
-      need(
-        input$clF1!=1,
-        ""
+  
+  ##### Make Bin. Table ----
+  output$pvalueF1 <- renderTable(
+    expr = {
+      validate(
+        need(expr = freqBinCheck() == 1, message = ""),
+        need(expr = input$nullF1 != 0 && input$nullF1 != 1, message = ""),
+        need(expr = input$trueF1 != 0 && input$trueF1 != 1, message = ""),
+        need(expr = input$clF1 != 1, message = "")
       )
-    )
-    p_value<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = nullF1(),
-      alternative="two.side",
-      tsmethod = "central"
-    )$p.value
-    ciP<-binom.exact(
-      x = sum(simulationF1()),
-      n = nF1(),
-      p = nullF1(),
-      alternative = "two.side",
-      tsmethod = "central",
-      conf.level = input$clF1
-    )$conf.int
-    ctable<-matrix(c(round(p_value,3),round(ciP[1],3),round(ciP[2],3)),nrow=1)
-    c2<-paste("Confidence interval"," lower bound",sep = "<br>")
-    c3<-paste("Confidence interval"," upper bound",sep = "<br>")
-    colnames(ctable)<-c("p-value",c2,c3)
-    ctable
-  },bordered = TRUE,sanitize.text.function=identity)
+      pValue <- binom.exact(
+        x = sum(simDataBF()),
+        n = input$nF1,
+        p = input$nullF1,
+        alternative = "two.side",
+        tsmethod = "central"
+      )$p.value
+      ciP <- binom.exact(
+        x = sum(simDataBF()),
+        n = input$nF1,
+        p = input$nullF1,
+        alternative = "two.side",
+        tsmethod = "central",
+        conf.level = input$clF1
+      )$conf.int
+      ctable <- matrix(
+        data = c(round(pValue, 3), round(ciP[1], 3), round(ciP[2], 3)),
+        nrow = 1
+      )
+      c2 <- paste("Confidence interval", " lower bound", sep = "<br>")
+      c3 <- paste("Confidence interval", " upper bound", sep = "<br>")
+      colnames(ctable) <- c("p-value", c2, c3)
+      ctable
+    },
+    bordered = TRUE,
+    sanitize.text.function = identity
+  )
+  
+  ## NEIL PICK UP HERE ----
 
   #### Bayes Side----
   ## parameters
@@ -1909,18 +1983,18 @@ server <- function(input, output, session) {
       )
     )
     ###prior
-    prange<-seq(0,1,length=1000)
+    pRange<-seq(0,1,length=1000)
     # density
     priory<-dbeta(
-      x=prange, 
+      x=pRange, 
       shape1 = s1(), 
       shape2 = s2()
     )
-    x<-prange
+    x<-pRange
     priordata<-as.data.frame(cbind(x,priory))
     ###posterior
     posteriory<-dbeta(
-      x=prange, 
+      x=pRange, 
       shape1 =s1() + sum(simulationB1()),
       shape2 =s2() + nB1() - sum(simulationB1())
     )
@@ -2043,13 +2117,13 @@ server <- function(input, output, session) {
         message = "Use the simulate button to generate new data"
       )
     )
-    prange<-seq(0,1,length=1000)
+    pRange<-seq(0,1,length=1000)
     likelihoody<-dbinom(
       x = sum(simulationB1()),
       size= nB1(),
-      p=prange
+      p=pRange
     )
-    x<-prange
+    x<-pRange
     # denominator 
     denominator<-dbinom(
       x = sum(simulationB1()),
@@ -2353,7 +2427,7 @@ server <- function(input, output, session) {
     )
     alpha<-1-input$clF2
     ### calculate p-value 
-    p_value<-poisson.exact(
+    pValue<-poisson.exact(
       x = sum(simulationF2()),
       T = nF2(),
       r = nullF2(),
@@ -2414,12 +2488,12 @@ server <- function(input, output, session) {
     ### plot
     data<-as.data.frame(cbind(thetalist,pvaluelist))
     data<-rename(data,theta=thetalist)
-    data<-rename(data,p_value=pvaluelist)
+    data<-rename(data,pValue=pvaluelist)
     g<-
       ggplot()+
       geom_line(
         data=data,
-        mapping = aes(x=theta,y=p_value),
+        mapping = aes(x=theta,y=pValue),
         color = "blue",
         size = 1,
         alpha = 0.5
@@ -2455,10 +2529,10 @@ server <- function(input, output, session) {
         aes(x = mean(simulationF2()), y = 0, xend = mean(simulationF2()), yend = 1, colour = "Observed estimate")
       )+
       geom_segment(
-        aes(x = xlim[1], y = p_value, xend = nullF2(), yend = p_value, colour = "Null value")
+        aes(x = xlim[1], y = pValue, xend = nullF2(), yend = pValue, colour = "Null value")
       )+
       geom_segment(
-        aes(x = nullF2(), y = 0, xend = nullF2(), yend = p_value, colour = "Null value")
+        aes(x = nullF2(), y = 0, xend = nullF2(), yend = pValue, colour = "Null value")
       )+
       geom_segment(
         aes(x = xlim[1], y = truePvalue, xend = trueF2(), yend = truePvalue, colour = "True value")
@@ -2506,7 +2580,7 @@ server <- function(input, output, session) {
       )
     )
     ### calculate p-value 
-    p_value<-poisson.exact(
+    pValue<-poisson.exact(
       x = sum(simulationF2()),
       T = nF2(),
       r = nullF2(),
@@ -2522,7 +2596,7 @@ server <- function(input, output, session) {
       tsmethod = "central",
       conf.level = input$clF2
     )$conf.int
-    ctable<-matrix(c(round(p_value,3),round(ci[1],3),round(ci[2],3)),nrow=1)
+    ctable<-matrix(c(round(pValue,3),round(ci[1],3),round(ci[2],3)),nrow=1)
     c2<-paste("Confidence interval"," lower bound",sep = "<br>")
     c3<-paste("Confidence interval"," upper bound",sep = "<br>")
     colnames(ctable)<-c("p-value",c2,c3)
@@ -2566,18 +2640,18 @@ server <- function(input, output, session) {
       )
     )
     ###prior
-    prange<-seq(0,10,by=0.01)
+    pRange<-seq(0,10,by=0.01)
     # density
     priory<-dgamma(
-      x=prange, 
+      x=pRange, 
       shape = input$para1B2, 
       rate = input$para2B2
     )
-    x<-prange
+    x<-pRange
     priordata<-as.data.frame(cbind(x,priory))
     ###posterior
     posteriory<-dgamma(
-      x=prange, 
+      x=pRange, 
       shape = input$para1B2 + sum(simulationB2()),
       rate = input$para2B2 + nB2()
     )
@@ -2674,13 +2748,13 @@ server <- function(input, output, session) {
         message = "Use the simulate button to generate new data"
       )
     )
-    prange<-seq(0,10,length=1000)
+    pRange<-seq(0,10,length=1000)
     ## likelihood for total counts
     likelihoody<-dpois(
       x = sum(simulationB2()),
-      lambda = prange*nB2()
+      lambda = pRange*nB2()
     )
-    x<-prange
+    x<-pRange
     # denominator 
     denominator<-dpois(
       x = sum(simulationB2()),
@@ -2987,8 +3061,8 @@ server <- function(input, output, session) {
     ### get p-values list
     genepvalues<-function(theta){
       z_score<-(mean(simulationF3())-theta)/(0.058/sqrt(nF3()))
-      p_value<-2*pnorm(-abs(z_score))
-      return(p_value)
+      pValue<-2*pnorm(-abs(z_score))
+      return(pValue)
     }
     thetarange<-c(lowerboundmax,upperboundmax)
     changetheta<-diff(thetarange)/1500
@@ -3005,12 +3079,12 @@ server <- function(input, output, session) {
     ###plot
     data<-as.data.frame(cbind(thetalist,pvaluelist))
     data<-rename(data,theta=thetalist)
-    data<-rename(data,p_value=pvaluelist)
+    data<-rename(data,pValue=pvaluelist)
     g<-
       ggplot()+
       geom_line(
         data=data,
-        mapping = aes(x=theta,y=p_value),
+        mapping = aes(x=theta,y=pValue),
         color = "blue",
         size = 1,
         alpha = 0.5
@@ -3142,14 +3216,14 @@ server <- function(input, output, session) {
       )
     )
     ###range
-    prange<-seq(-1,1,length=1000)
+    pRange<-seq(-1,1,length=1000)
     # density
     priory<-dnorm(
-      x=prange, 
+      x=pRange, 
       mean = input$para1B3, 
       sd = input$para2B3
     )
-    x<-prange
+    x<-pRange
     priordata<-as.data.frame(cbind(x,priory))
     ###posterior
     a<-1/(input$para2B3^2)
@@ -3157,7 +3231,7 @@ server <- function(input, output, session) {
     mupost<-(a*input$para1B3+b*mean(simulationB3()))/(a+b)
     sd2post<-1/(a+b)
     posteriory<-dnorm(
-      x=prange, 
+      x=pRange, 
       mean = mupost,
       sd = sqrt(sd2post)
     )
@@ -3250,13 +3324,13 @@ server <- function(input, output, session) {
         message = "Use the simulate button to generate new data"
       )
     )
-    prange<-seq(-1,1,length=1000)
+    pRange<-seq(-1,1,length=1000)
     likelihoody<-dnorm(
-      x = prange,
+      x = pRange,
       mean = mean(simulationB3()),
       sd = 0.058
     )
-    x<-prange
+    x<-pRange
     # denominator 
     denominator<-dnorm(
       x = nullB3(),
