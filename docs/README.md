@@ -6,4 +6,4 @@
 
 # App Description
 
-This app is focused on the bayesian inference, bayesian hypothesis testing and bayes factor.
+This app is focused on the Bayesian inference, Bayesian hypothesis testing and bayes factor.
